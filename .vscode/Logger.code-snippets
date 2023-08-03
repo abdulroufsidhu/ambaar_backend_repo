@@ -1,0 +1,49 @@
+{
+	// Place your server workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	"Success Log": {
+		"scope": "javascript,typescript",
+		"prefix": "logs",
+		"body": [
+			"Logger.s('$TM_FILENAME_BASE', `$1`)"
+		],
+		"description": "Prints success log to console"
+	},
+	"Debug Log": {
+		"scope": "javascript,typescript",
+		"prefix": "logd",
+		"body": [
+			"Logger.d('$TM_FILENAME_BASE', `$1`)"
+		],
+		"description": "Prints debug log to console"
+	},
+	"Info Log": {
+		"scope": "javascript,typescript",
+		"prefix": "logi",
+		"body": [
+			"Logger.i('$TM_FILENAME_BASE', `$1`)"
+		],
+		"description": "Prints info log to console"
+	},
+	"Warning Log": {
+		"scope": "javascript,typescript",
+		"prefix": "logw",
+		"body": [
+			"Logger.w('$TM_FILENAME_BASE', `$1`)"
+		],
+		"description": "Prints warning log to console"
+	},
+	"Error Log": {
+		"scope": "javascript,typescript",
+		"prefix": "loge",
+		"body": [
+			"Logger.d('$TM_FILENAME_BASE', `$1`)"
+		],
+		"description": "Prints error log to console"
+	},
+}
