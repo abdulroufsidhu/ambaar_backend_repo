@@ -13,11 +13,11 @@ const create = (user: IUser) => {
     );
 };
 
-const fromEmail = (email: string) =>
+const fromEmail = (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
       ? undefined
-      : User.findOne({ person: p._id })
+      : User.findOne({ person: p._id, password: password })
           .populate("person")
           .exec()
           .then((user) => user)
@@ -35,7 +35,9 @@ const createReq = (req: Request, res: Response, next: NextFunction) => {
   Logger.w("User", body);
   return (
     create(body)
-      ?.then((user) => res.status(201).json({ user }))
+      ?.then((user) =>
+        res.status(201).json({ _id: user._id, person: user.person })
+      )
       ?.catch((error) => res.status(500).json({ error })) ??
     res.status(500).json({ error: "User not created" })
   );
@@ -43,10 +45,15 @@ const createReq = (req: Request, res: Response, next: NextFunction) => {
 
 const readReq = (req: Request, res: Response, next: NextFunction) => {
   const email = req.params.email;
-  return fromEmail(email)
+  const password = req.params.password;
+
+  if (!!!email || !!!password)
+    return res.status(500).json({ error: "email or password is missing" });
+
+  return fromEmail(email, password)
     .then((user) =>
       user
-        ? res.status(201).json({ user })
+        ? res.status(201).json({ _id: user._id, person: user.person })
         : res.status(404).json({ message: "User Not Found" })
     )
     .catch((error) => res.status(500).json({ error }));
