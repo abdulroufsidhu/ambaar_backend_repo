@@ -36,7 +36,7 @@ const createReq = (req: Request, res: Response, next: NextFunction) => {
   return (
     create(body)
       ?.then((user) =>
-        res.status(201).json({ _id: user._id, person: user.person })
+        res.status(201).json({ _id: user?._id, person: user?.person })
       )
       ?.catch((error) => res.status(500).json({ error })) ??
     res.status(500).json({ error: "User not created" })

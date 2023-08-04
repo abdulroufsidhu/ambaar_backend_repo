@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IPerson } from "./Person";
+import uniqueValidator from "mongoose-unique-validator";
 
 export interface IUser {
   person: IPerson;
@@ -10,10 +11,15 @@ interface IUserModel extends IUser, Document {}
 
 const UserSchema: Schema = new Schema(
   {
-    person: { type: mongoose.Types.ObjectId, required: true, ref: "Person" },
+    person: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Person",
+      unique: true,
+    },
     password: { type: String, required: true },
   },
   { versionKey: false }
 );
-
+UserSchema.plugin(uniqueValidator);
 export default mongoose.model<IUserModel>("User", UserSchema);
