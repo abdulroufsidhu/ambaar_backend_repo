@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
 import Person, { IPerson } from "../models/Person";
 
 const create = (person: IPerson) => {
@@ -30,8 +29,10 @@ const create = (person: IPerson) => {
   });
 };
 
-const read = (id: string) => Person.findById(id).then((p) => p);
+const fromId = (id: string) => Person.findById(id).then((p) => p);
 const remove = (id: string) => Person.findByIdAndDelete(id).then((p) => p);
+const fromEmail = (email: string) =>
+  Person.findOne({ email: email }).then((p) => p);
 
 const createReq = (req: Request, res: Response, next: NextFunction) => {
   const body: IPerson = req.body;
@@ -42,7 +43,7 @@ const createReq = (req: Request, res: Response, next: NextFunction) => {
 
 const readReq = (req: Request, res: Response, next: NextFunction) => {
   const personId = req.params.personId;
-  return read(personId)
+  return fromId(personId)
     .then((person) =>
       person
         ? res.status(201).json({ person })
@@ -65,7 +66,8 @@ const removeReq = (req: Request, res: Response, next: NextFunction) => {
 
 export default {
   create,
-  read,
+  fromId,
+  fromEmail,
   remove,
   // TODO update,
   createReq,

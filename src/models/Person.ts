@@ -8,7 +8,7 @@ export interface IPerson {
   email?: string;
 }
 
-interface IPersonModel extends IPerson, Document {}
+export interface IPersonModel extends IPerson, Document {}
 
 const PersonSchema: Schema = new Schema(
   {

@@ -4,16 +4,24 @@ import http from "http";
 import { config } from "./config/config";
 import { Logger } from "./libraries/Logger";
 import personRoutes from "./routes/Person";
+import userRoutes from "./routes/User";
 
 const server = express();
 
-mongoose
-  .connect(config.DB.url)
-  .then(() => {
-    Logger.d("server", "connedted to database");
-    startServer();
-  })
-  .catch((error) => Logger.d("server", `${error}`));
+const connectToDB = () => {
+  mongoose
+    .connect(config.DB.url)
+    .then(() => {
+      Logger.d("server", "connedted to database");
+      startServer();
+    })
+    .catch((error) => {
+      Logger.d("server", `${error}`);
+      connectToDB();
+    });
+};
+
+connectToDB();
 
 function startServer() {
   // Server Requests Logger Middleware
@@ -32,8 +40,8 @@ function startServer() {
     next();
   });
 
-  server.use(express.urlencoded({ extended: true }));
   server.use(express.json());
+  server.use(express.urlencoded({ extended: true }));
 
   // Rules for api
   server.use((req, res, next) => {
@@ -54,6 +62,7 @@ function startServer() {
 
   // Routes
   server.use("/persons", personRoutes);
+  server.use("/users", userRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

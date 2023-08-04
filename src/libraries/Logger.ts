@@ -9,28 +9,28 @@ export class Logger {
       )
     );
   static d = (TAG: string, msg: any) =>
-    console.log(
+    console.debug(
       chalk.whiteBright(
         `d\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.whiteBright(msg)
       )
     );
   static i = (TAG: string, msg: any) =>
-    console.log(
+    console.info(
       chalk.cyanBright(
         `d\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.cyanBright(msg)
       )
     );
   static w = (TAG: string, msg: any) =>
-    console.log(
+    console.warn(
       chalk.yellowBright(
         `d\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.yellowBright(msg)
       )
     );
   static e = (TAG: string, msg: any) =>
-    console.log(
+    console.error(
       chalk.redBright(
         `d\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.redBright(msg)
