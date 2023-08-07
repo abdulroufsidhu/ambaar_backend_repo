@@ -10,16 +10,16 @@ export interface IEmployee {
   permissions: Array<IPermission>;
 }
 
-interface IEmployeeModel extends IEmployee, Document {}
+interface IEmployeeModel extends IEmployee, Document { }
 
 const EmployeeSchema: Schema = new Schema(
   {
-    user: { type: mongoose.Types.ObjectId, require: true, ref: "User" },
-    branch: { type: mongoose.Types.ObjectId, require: true, ref: "Branch" },
-    role: { type: String, require: true },
+    user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+    branch: { type: mongoose.Types.ObjectId, required: true, ref: "Branch" },
+    role: { type: String, required: true },
     prmissions: {
       type: mongoose.Types.Array<mongoose.Types.ObjectId>,
-      require: true,
+      required: true,
       ref: "Permission",
     },
   },

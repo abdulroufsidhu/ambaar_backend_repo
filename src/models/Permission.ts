@@ -5,11 +5,11 @@ export interface IPermission {
   allowed: boolean;
 }
 
-interface IPermissionModel extends IPermission, Document {}
+interface IPermissionModel extends IPermission, Document { }
 
 const PermissionSchema: Schema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     allowed: { type: Boolean, required: true },
   },
   { versionKey: false }
