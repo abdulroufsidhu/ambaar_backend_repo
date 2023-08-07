@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IPerson } from "./Person";
+import { IPerson } from "./person";
 import uniqueValidator from "mongoose-unique-validator";
 
 export interface IUser {
@@ -7,7 +7,7 @@ export interface IUser {
   password: string;
 }
 
-interface IUserModel extends IUser, Document {}
+interface IUserModel extends IUser, Document { }
 
 const UserSchema: Schema = new Schema(
   {
@@ -16,6 +16,7 @@ const UserSchema: Schema = new Schema(
       required: true,
       ref: "Person",
       unique: true,
+      trim: true
     },
     password: { type: String, required: true },
   },

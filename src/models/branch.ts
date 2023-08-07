@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IBusiness } from "./Business";
+import { IBusiness } from "./business";
 import mongooseUniqueValidator from "mongoose-unique-validator";
 
 export interface IBranch {
@@ -15,9 +15,9 @@ interface IBranchModel extends IBranch, Document { }
 const BranchSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    contact: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    location: { type: String, required: true, unique: true, },
+    contact: { type: String, required: true, unique: true, trim: true },
+    email: { type: String, required: true, unique: true, trim: true },
+    location: { type: String, required: true, trim: true },
     business: { type: mongoose.Types.ObjectId, ref: "Business" },
   },
   { versionKey: false }

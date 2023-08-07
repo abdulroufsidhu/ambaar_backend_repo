@@ -4,7 +4,7 @@ export class Logger {
   static s = (TAG: string, msg: any) =>
     console.log(
       chalk.greenBright(
-        `d\t[${new Date().toTimeString()}]\t${TAG}: `,
+        `s\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.greenBright(msg)
       )
     );
@@ -18,21 +18,21 @@ export class Logger {
   static i = (TAG: string, msg: any) =>
     console.info(
       chalk.cyanBright(
-        `d\t[${new Date().toTimeString()}]\t${TAG}: `,
+        `i\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.cyanBright(msg)
       )
     );
   static w = (TAG: string, msg: any) =>
     console.warn(
       chalk.yellowBright(
-        `d\t[${new Date().toTimeString()}]\t${TAG}: `,
+        `w\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.yellowBright(msg)
       )
     );
   static e = (TAG: string, msg: any) =>
     console.error(
       chalk.redBright(
-        `d\t[${new Date().toTimeString()}]\t${TAG}: `,
+        `e\t[${new Date().toTimeString()}]\t${TAG}: `,
         chalk.redBright(msg)
       )
     );

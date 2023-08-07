@@ -2,9 +2,14 @@ import express from "express";
 import mongoose from "mongoose";
 import http from "http";
 import { config } from "./config/config";
-import { Logger } from "./libraries/Logger";
-import personRoutes from "./routes/Person";
-import userRoutes from "./routes/User";
+import { Logger } from "./libraries/logger";
+import {
+  businessRoutes,
+  personRoutes,
+  userRoutes,
+  branchRoutes,
+  employeeRoutes
+} from './routes'
 
 const server = express();
 
@@ -63,6 +68,9 @@ function startServer() {
   // Routes
   server.use("/persons", personRoutes);
   server.use("/users", userRoutes);
+  server.use("/businesses", businessRoutes);
+  server.use("/branches", branchRoutes);
+  server.use("/employees", employeeRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import Permission, { IPermission } from "../models/Permission";
+import { Permission, IPermission } from "../models";
 
 const create = async (permission: IPermission) => {
   const p = new Permission({ ...permission });

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import personController from "./Person";
-import User, { IUser } from "../models/User";
-import { Logger } from "../libraries/Logger";
+import personController from "./person";
+import { User, IUser } from "../models";
+import { Logger } from "../libraries/logger";
 
 const create = async (user: IUser) => {
   if (!!!user.person) return;
