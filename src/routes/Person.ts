@@ -4,8 +4,8 @@ import controller from "../controllers/Person";
 const router = express.Router();
 
 router.post("/create", controller.createReq);
-router.get("/get/:personId", controller.readReq);
+router.get("/get", controller.readReq); // /get?id="testId"
 router.patch("/update", controller.updateReq);
-router.delete("/remove/:personId", controller.removeReq);
+router.delete("/remove", controller.removeReq); // /remove?id="testId"
 
 export = router;

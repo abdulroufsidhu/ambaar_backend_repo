@@ -3,7 +3,7 @@ import personController from "./Person";
 import User, { IUser } from "../models/User";
 import { Logger } from "../libraries/Logger";
 
-const create = (user: IUser) => {
+const create = async (user: IUser) => {
   if (!!!user.person) return;
   if (!!!user.password) return;
   return personController
@@ -13,21 +13,21 @@ const create = (user: IUser) => {
     );
 };
 
-const fromEmail = (email: string, password: string) =>
+const fromEmail = async (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
       ? undefined
       : User.findOne({ person: p._id, password: password })
-          .populate("person")
-          .exec()
-          .then((user) => user)
+        .populate("person")
+        .exec()
+        .then((user) => user)
   );
 
-const fromId = (id: string) => User.findById(id).then((user) => user);
+const fromId = async (id: string) => User.findById(id).then((user) => user);
 
-const remove = (id: string) => User.findByIdAndDelete(id).then((user) => user);
+const remove = async (id: string) => User.findByIdAndDelete(id).then((user) => user);
 
-const createReq = (req: Request, res: Response, next: NextFunction) => {
+const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IUser = {
     password: req.body.password,
     person: req.body.person,
@@ -43,13 +43,13 @@ const createReq = (req: Request, res: Response, next: NextFunction) => {
   );
 };
 
-const readReq = (req: Request, res: Response, next: NextFunction) => {
-  const email = req.params.email;
-  const password = req.params.password;
+const readReq = async (req: Request, res: Response, next: NextFunction) => {
+  const email = req.query.email;
+  const password = req.query.password;
 
-  if (!!!email || !!!password)
+  if (!!!email || !!!password || typeof email != "string" || typeof password != "string") {
     return res.status(500).json({ error: "email or password is missing" });
-
+  }
   return fromEmail(email, password)
     .then((user) =>
       user
@@ -58,17 +58,20 @@ const readReq = (req: Request, res: Response, next: NextFunction) => {
     )
     .catch((error) => res.status(500).json({ error }));
 };
-const updateReq = (req: Request, res: Response, next: NextFunction) => {
+const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IUser = req.body;
   return User.findByIdAndUpdate(req.body._id, body)
     .then((user) => res.status(201).json({ user }))
     .catch((error) => res.status(500).json({ error }));
 };
-const removeReq = (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.uid;
-  return remove(id)
-    .then((user) => (user ? user : { error: "User Not Removed" }))
-    .catch((error) => res.status(500).json({ error }));
+const removeReq = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.query.id;
+  if (typeof id == "string") {
+    return remove(id)
+      .then((user) => (user ? user : { error: "User Not Removed" }))
+      .catch((error) => res.status(500).json({ error }));
+  }
+  return res.status(500).json({ error: "Please make sure to provide id query parameter" })
 };
 
 export default {
