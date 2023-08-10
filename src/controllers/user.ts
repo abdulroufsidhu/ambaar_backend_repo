@@ -18,21 +18,22 @@ const fromEmail = async (email: string, password: string) =>
     !!!p
       ? undefined
       : User.findOne({ person: p._id, password: password })
-        .populate("person")
-        .exec()
-        .then((user) => user)
+          .populate("person")
+          .exec()
+          .then((user) => user)
   );
 
 const fromId = async (id: string) => User.findById(id).then((user) => user);
 
-const remove = async (id: string) => User.findByIdAndDelete(id).then((user) => user);
+const remove = async (id: string) =>
+  User.findByIdAndDelete(id).then((user) => user);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IUser = {
     password: req.body.password,
     person: req.body.person,
   };
-  Logger.w("User", body);
+  Logger.w("User", req.body);
   return (
     create(body)
       ?.then((user) =>
@@ -47,7 +48,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
   const email = req.query.email;
   const password = req.query.password;
 
-  if (!!!email || !!!password || typeof email != "string" || typeof password != "string") {
+  if (
+    !!!email ||
+    !!!password ||
+    typeof email != "string" ||
+    typeof password != "string"
+  ) {
     return res.status(500).json({ error: "email or password is missing" });
   }
   return fromEmail(email, password)
@@ -71,7 +77,9 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((user) => (user ? user : { error: "User Not Removed" }))
       .catch((error) => res.status(500).json({ error }));
   }
-  return res.status(500).json({ error: "Please make sure to provide id query parameter" })
+  return res
+    .status(500)
+    .json({ error: "Please make sure to provide id query parameter" });
 };
 
 export default {

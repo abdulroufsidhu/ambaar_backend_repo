@@ -3,15 +3,19 @@ import mongoose from "mongoose";
 import http from "http";
 import { config } from "./config/config";
 import { Logger } from "./libraries/logger";
+import cors from "cors";
 import {
   businessRoutes,
   personRoutes,
   userRoutes,
   branchRoutes,
-  employeeRoutes
-} from './routes'
+  employeeRoutes,
+  permissionRoutes,
+} from "./routes";
 
 const server = express();
+
+server.use(cors());
 
 const connectToDB = () => {
   mongoose
@@ -39,7 +43,7 @@ function startServer() {
     res.on("finish", () => {
       Logger.s(
         "server",
-        `received -> method: [${req.method}] - url: [${req.url}] - ip: [${req.socket.remoteAddress}] - status: [${req.statusCode}]]`
+        `received -> method: [${req.method}] - url: [${req.originalUrl}] - ip: [${req.socket.remoteAddress}] - status: [${req.statusCode}]`
       );
     });
     next();
@@ -51,10 +55,10 @@ function startServer() {
   // Rules for api
   server.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-      "Access-Control-Allow-Origin",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
+    // res.header(
+    //   "Access-Control-Allow-Origin",
+    //   "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    // );
     if (req.method.toLocaleLowerCase() == "options") {
       res.header(
         "Access-Control-Allow-Methods",
@@ -71,6 +75,7 @@ function startServer() {
   server.use("/businesses", businessRoutes);
   server.use("/branches", branchRoutes);
   server.use("/employees", employeeRoutes);
+  server.use("/permissions", permissionRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

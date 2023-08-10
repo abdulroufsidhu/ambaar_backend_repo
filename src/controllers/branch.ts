@@ -3,16 +3,27 @@ import { Branch, IBranch } from "../models";
 
 const create = async (branch: IBranch) => {
   const b = new Branch({ ...branch });
-  return b.save().then(branch => branch);
-}
+  return b.save().then((branch) => branch);
+};
 
-const fromId = async (id: string) => Branch.findById(id).populate("business").then((b) => b);
-const fromBusinessId = async (id: string) => Branch.find({ business: id }).populate("business").then(b => b);
+const fromId = async (id: string) =>
+  Branch.findById(id)
+    .populate("business")
+    .then((b) => b);
+const fromBusinessId = async (id: string) =>
+  Branch.find({ business: id })
+    .populate("business")
+    .then((b) => b);
 const fromEmail = async (email: string) =>
-  Branch.findOne({ email: email }).populate("business").then((b) => b);
+  Branch.findOne({ email: email })
+    .populate("business")
+    .then((b) => b);
 const fromContact = async (contact: string) =>
-  Branch.findOne({ contact: contact }).populate("business").then((b) => b);
-const remove = async (id: string) => Branch.findByIdAndDelete(id).then((b) => b);
+  Branch.findOne({ contact: contact })
+    .populate("business")
+    .then((b) => b);
+const remove = async (id: string) =>
+  Branch.findByIdAndDelete(id).then((b) => b);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
@@ -40,7 +51,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromBusinessId(business_id)
       .then((branch) =>
         branch
-          ? res.status(201).json({ branch })
+          ? res.status(201).json([...branch])
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -63,8 +74,10 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       )
       .catch((error) => res.status(500).json({ error }));
   }
-  return res.status(500).json({ error: "Please make sure to provide id, contact, business_id or email query parameter" });
-
+  return res.status(500).json({
+    error:
+      "Please make sure to provide id, contact, business_id or email query parameter",
+  });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
@@ -75,7 +88,11 @@ const updateReq = async (req: Request, res: Response, next: NextFunction) => {
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.params.id;
   return remove(id)
-    .then((branch) => (branch ? res.status(201).json({ branch }) : res.status(500).json({ error: "Branch Not Removed" })))
+    .then((branch) =>
+      branch
+        ? res.status(201).json({ branch })
+        : res.status(500).json({ error: "Branch Not Removed" })
+    )
     .catch((error) => res.status(500).json({ error }));
 };
 
