@@ -81,7 +81,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
-  return Branch.findByIdAndUpdate(req.body._id)
+  return Branch.findByIdAndUpdate(req.body._id, body)
     .then((branch) => res.status(201).json({ branch }))
     .catch((error) => res.status(500).json({ error }));
 };

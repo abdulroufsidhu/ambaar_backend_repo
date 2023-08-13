@@ -5,12 +5,12 @@ import { IPermission } from "./permission";
 
 export interface IEmployee {
   user: IUser;
-  brach: IBranch;
+  branch: IBranch;
   role: string;
   permissions: Array<IPermission>;
 }
 
-interface IEmployeeModel extends IEmployee, Document { }
+interface IEmployeeModel extends IEmployee, Document {}
 
 const EmployeeSchema: Schema = new Schema(
   {
@@ -19,11 +19,10 @@ const EmployeeSchema: Schema = new Schema(
     role: { type: String, required: true },
     permissions: {
       type: Array<mongoose.Types.ObjectId>,
-      required: true,
       ref: "Permission",
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export default mongoose.model<IEmployeeModel>("Employee", EmployeeSchema);

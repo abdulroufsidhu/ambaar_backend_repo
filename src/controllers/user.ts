@@ -13,6 +13,8 @@ const create = async (user: IUser) => {
     );
 };
 
+const fromPerson = async (person_id: string) =>
+  User.findOne({ person: person_id }).then((user) => user);
 const fromEmail = async (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
@@ -84,6 +86,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
 
 export default {
   create,
+  fromPerson,
   fromEmail,
   fromId,
   remove,

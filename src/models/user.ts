@@ -7,7 +7,7 @@ export interface IUser {
   password: string;
 }
 
-interface IUserModel extends IUser, Document { }
+interface IUserModel extends IUser, Document {}
 
 const UserSchema: Schema = new Schema(
   {
@@ -16,11 +16,11 @@ const UserSchema: Schema = new Schema(
       required: true,
       ref: "Person",
       unique: true,
-      trim: true
+      trim: true,
     },
     password: { type: String, required: true },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 UserSchema.plugin(uniqueValidator);
 export default mongoose.model<IUserModel>("User", UserSchema);

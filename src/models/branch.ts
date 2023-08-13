@@ -10,7 +10,7 @@ export interface IBranch {
   business: IBusiness;
 }
 
-interface IBranchModel extends IBranch, Document { }
+interface IBranchModel extends IBranch, Document {}
 
 const BranchSchema: Schema = new Schema(
   {
@@ -20,9 +20,9 @@ const BranchSchema: Schema = new Schema(
     location: { type: String, required: true, trim: true },
     business: { type: mongoose.Types.ObjectId, ref: "Business" },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
-BranchSchema.plugin(mongooseUniqueValidator)
+BranchSchema.plugin(mongooseUniqueValidator);
 
 export default mongoose.model<IBranchModel>("Branch", BranchSchema);

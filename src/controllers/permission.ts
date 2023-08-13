@@ -42,7 +42,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPermission = req.body;
-  return Permission.findByIdAndUpdate(req.body._id)
+  return Permission.findByIdAndUpdate(req.body._id, body)
     .then((permission) => res.status(201).json({ permission }))
     .catch((error) => res.status(500).json({ error }));
 };

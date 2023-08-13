@@ -10,7 +10,7 @@ export interface IBusiness {
   founder: IPerson;
 }
 
-interface IBusinessModel extends IBusiness, Document { }
+interface IBusinessModel extends IBusiness, Document {}
 
 const BusinessSchema: Schema = new Schema(
   {
@@ -20,7 +20,7 @@ const BusinessSchema: Schema = new Schema(
     licence: { type: String },
     founder: { type: mongoose.Types.ObjectId, trim: true, ref: "Person" },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 BusinessSchema.plugin(mongooseUniqueValidator);

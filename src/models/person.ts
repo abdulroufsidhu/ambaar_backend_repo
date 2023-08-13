@@ -9,7 +9,7 @@ export interface IPerson {
   email?: string;
 }
 
-interface IPersonModel extends IPerson, Document { }
+interface IPersonModel extends IPerson, Document {}
 
 const PersonSchema: Schema = new Schema(
   {
@@ -19,9 +19,9 @@ const PersonSchema: Schema = new Schema(
     nationalId: { type: String, trim: true, unique: true },
     email: { type: String, unique: true, trim: true, index: true },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
-PersonSchema.plugin(mongooseUniqueValidator)
+PersonSchema.plugin(mongooseUniqueValidator);
 
 export default mongoose.model<IPersonModel>("Person", PersonSchema);

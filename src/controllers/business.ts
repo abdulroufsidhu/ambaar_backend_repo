@@ -109,7 +109,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
-  return Business.findByIdAndUpdate(req.body._id)
+  return Business.findByIdAndUpdate(req.body._id, body)
     .then((business) => res.status(201).json({ business }))
     .catch((error) => res.status(500).json({ error }));
 };

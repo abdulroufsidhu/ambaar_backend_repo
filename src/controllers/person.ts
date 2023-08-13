@@ -30,11 +30,14 @@ const create = async (person: IPerson) => {
 };
 
 const fromId = async (id: string) => Person.findById(id).then((p) => p);
-const fromContact = async (contact: string) => Person.findOne({ contact: contact }).then((p) => p);
-const fromNationalId = async (nationalId: string) => Person.findOne({ nationalId: nationalId }).then((p) => p);
+const fromContact = async (contact: string) =>
+  Person.findOne({ contact: contact }).then((p) => p);
+const fromNationalId = async (nationalId: string) =>
+  Person.findOne({ nationalId: nationalId }).then((p) => p);
 const fromEmail = async (email: string) =>
   Person.findOne({ email: email }).then((p) => p);
-const remove = async (id: string) => Person.findByIdAndDelete(id).then((p) => p);
+const remove = async (id: string) =>
+  Person.findByIdAndDelete(id).then((p) => p);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPerson = req.body;
@@ -84,11 +87,16 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       )
       .catch((error) => res.status(500).json({ error }));
   }
-  return res.status(500).json({ error: "Please make sure to provide id, contact, nationalId or email query parameter" });
+  return res
+    .status(500)
+    .json({
+      error:
+        "Please make sure to provide id, contact, nationalId or email query parameter",
+    });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPerson = req.body;
-  return Person.findByIdAndUpdate(req.body._id)
+  return Person.findByIdAndUpdate(req.body._id, body)
     .then((person) => res.status(201).json({ person }))
     .catch((error) => res.status(500).json({ error }));
 };
@@ -99,7 +107,9 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((p) => (p ? p : { error: "Person Not Removed" }))
       .catch((error) => res.status(500).json({ error }));
   }
-  return res.status(500).json({ error: "Please make sure to provide id query parameter" });
+  return res
+    .status(500)
+    .json({ error: "Please make sure to provide id query parameter" });
 };
 
 export default {
