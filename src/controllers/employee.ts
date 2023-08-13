@@ -17,6 +17,13 @@ const fromUserId = async (id: string) =>
 const fromBranchId = async (id: string) =>
   Employee.find({ branch: id })
     .populate(["user", "branch", "permissions"])
+    .populate({
+      path: "user",
+      populate: {
+        path: "person",
+        model: "Person",
+      },
+    })
     .then((e) => e);
 
 const remove = async (id: string) =>
@@ -46,7 +53,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromUserId(uid)
       .then((employee) =>
         employee
-          ? res.status(201).json({ employee })
+          ? res.status(201).json([...employee])
           : res.status(404).json({ message: "Employee Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -55,7 +62,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromBranchId(branchId)
       .then((employee) =>
         employee
-          ? res.status(201).json({ employee })
+          ? res.status(201).json([...employee])
           : res.status(404).json({ message: "Employee Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));

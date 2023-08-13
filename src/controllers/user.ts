@@ -6,11 +6,16 @@ import { Logger } from "../libraries/logger";
 const create = async (user: IUser) => {
   if (!!!user.person) return;
   if (!!!user.password) return;
-  return personController
-    .create(user.person)
-    .then((person) =>
-      new User({ person, password: user.password }).save().then((user) => user)
-    );
+  return personController.create(user.person).then((person) =>
+    fromPerson(person._id)
+      .then((user) => user)
+      .catch((error) => {
+        Logger.d("user", `${error}`);
+        new User({ person, password: user.password })
+          .save()
+          .then((user) => user);
+      })
+  );
 };
 
 const fromPerson = async (person_id: string) =>
