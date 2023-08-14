@@ -4,6 +4,7 @@ import employeeController from "./employee";
 import permissionController from "./permission";
 import personController from "./person";
 import userController from "./user";
+import productController from "./product";
 
 export {
   branchController,
@@ -12,4 +13,5 @@ export {
   permissionController,
   personController,
   userController,
+  productController,
 };

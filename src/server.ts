@@ -11,6 +11,7 @@ import {
   branchRoutes,
   employeeRoutes,
   permissionRoutes,
+  productRoutes,
 } from "./routes";
 
 const server = express();
@@ -76,6 +77,7 @@ function startServer() {
   server.use("/branches", branchRoutes);
   server.use("/employees", employeeRoutes);
   server.use("/permissions", permissionRoutes);
+  server.use("/products", productRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

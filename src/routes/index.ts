@@ -4,6 +4,7 @@ import userRoutes from "./user";
 import branchRoutes from "./branch";
 import employeeRoutes from "./employee";
 import permissionRoutes from "./permission";
+import productRoutes from "./product";
 export {
   businessRoutes,
   personRoutes,
@@ -11,4 +12,5 @@ export {
   branchRoutes,
   employeeRoutes,
   permissionRoutes,
+  productRoutes,
 };
