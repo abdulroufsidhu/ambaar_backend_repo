@@ -12,6 +12,8 @@ import {
   employeeRoutes,
   permissionRoutes,
   productRoutes,
+  routes,
+  inventoryRoutes,
 } from "./routes";
 
 const server = express();
@@ -71,13 +73,14 @@ function startServer() {
   });
 
   // Routes
-  server.use("/persons", personRoutes);
-  server.use("/users", userRoutes);
-  server.use("/businesses", businessRoutes);
-  server.use("/branches", branchRoutes);
-  server.use("/employees", employeeRoutes);
-  server.use("/permissions", permissionRoutes);
-  server.use("/products", productRoutes);
+  server.use(routes.person, personRoutes);
+  server.use(routes.users, userRoutes);
+  server.use(routes.businesses, businessRoutes);
+  server.use(routes.branches, branchRoutes);
+  server.use(routes.employees, employeeRoutes);
+  server.use(routes.permissions, permissionRoutes);
+  server.use(routes.products, productRoutes);
+  server.use(routes.inventory, inventoryRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));
