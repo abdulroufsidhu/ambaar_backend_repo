@@ -42,7 +42,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((branch) =>
         branch
-          ? res.status(201).json({ branch })
+          ? res.status(200).json({ branch })
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -51,7 +51,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromBusinessId(business_id)
       .then((branch) =>
         branch
-          ? res.status(201).json([...branch])
+          ? res.status(200).json([...branch])
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -60,7 +60,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromEmail(email)
       .then((branch) =>
         branch
-          ? res.status(201).json({ branch })
+          ? res.status(200).json({ branch })
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -69,7 +69,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromContact(contact)
       .then((branch) =>
         branch
-          ? res.status(201).json({ branch })
+          ? res.status(200).json({ branch })
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -82,7 +82,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
   return Branch.findByIdAndUpdate(req.body._id, body)
-    .then((branch) => res.status(201).json({ branch }))
+    .then((branch) => res.status(204).json({ branch }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -90,7 +90,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   return remove(id)
     .then((branch) =>
       branch
-        ? res.status(201).json({ branch })
+        ? res.status(200).json({ branch })
         : res.status(500).json({ error: "Branch Not Removed" })
     )
     .catch((error) => res.status(500).json({ error }));

@@ -8,20 +8,26 @@ const create = async (employee: IEmployee) => {
 
 const fromId = async (id: string) =>
   Employee.findById(id)
-    .populate(["user", "permissions"])
-    .populate("-user.password")
+    .populate(["user", "branch", "permissions"])
     .populate({
       path: "user",
       select: "-password",
       populate: {
         path: "person",
         model: "Person",
+      },
+    })
+    .populate({
+      path: "branch",
+      populate: {
+        path: "business",
+        model: "Business",
       },
     })
     .then((e) => e);
 const fromUserId = async (id: string) =>
   Employee.find({ user: id })
-    .populate(["user", "permissions"])
+    .populate(["user", "branch", "permissions"])
     .populate({
       path: "user",
       select: "-password",
@@ -30,16 +36,30 @@ const fromUserId = async (id: string) =>
         model: "Person",
       },
     })
+    .populate({
+      path: "branch",
+      populate: {
+        path: "business",
+        model: "Business",
+      },
+    })
     .then((e) => e);
 const fromBranchId = async (id: string) =>
   Employee.find({ branch: id })
-    .populate(["user", "permissions"])
+    .populate(["user", "branch", "permissions"])
     .populate({
       path: "user",
       select: "-password",
       populate: {
         path: "person",
         model: "Person",
+      },
+    })
+    .populate({
+      path: "branch",
+      populate: {
+        path: "business",
+        model: "Business",
       },
     })
     .then((e) => e);
@@ -62,7 +82,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((employee) =>
         employee
-          ? res.status(201).json({ employee })
+          ? res.status(200).json({ employee })
           : res.status(404).json({ message: "Employee Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -71,7 +91,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromUserId(uid)
       .then((employee) =>
         employee
-          ? res.status(201).json([...employee])
+          ? res.status(200).json([...employee])
           : res.status(404).json({ message: "Employee Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -80,7 +100,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromBranchId(branchId)
       .then((employee) =>
         employee
-          ? res.status(201).json([...employee])
+          ? res.status(200).json([...employee])
           : res.status(404).json({ message: "Employee Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -92,7 +112,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
   return Employee.findByIdAndUpdate(req.body._id, body)
-    .then((employee) => res.status(201).json({ employee }))
+    .then((employee) => res.status(204).json({ employee }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -100,7 +120,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   return remove(id)
     .then((employee) =>
       employee
-        ? res.status(201).json({ employee })
+        ? res.status(200).json({ employee })
         : res.status(500).json({ error: "Employee Not Removed" })
     )
     .catch((error) => res.status(500).json({ error }));

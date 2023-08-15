@@ -26,14 +26,14 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((permission) =>
         permission
-          ? res.status(201).json({ permission })
+          ? res.status(200).json({ permission })
           : res.status(404).json({ message: "Branch Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
   }
   if (typeof name == "string") {
     return fromName(name)
-      .then((permissions) => res.status(201).json({ permissions }))
+      .then((permissions) => res.status(200).json({ permissions }))
       .catch((error) => res.status(500).json({ error }));
   }
   return res.status(500).json({
@@ -43,7 +43,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPermission = req.body;
   return Permission.findByIdAndUpdate(req.body._id, body)
-    .then((permission) => res.status(201).json({ permission }))
+    .then((permission) => res.status(204).json({ permission }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,7 +52,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
     return remove(id)
       .then((permission) =>
         permission
-          ? res.status(201).json({ permission })
+          ? res.status(200).json({ permission })
           : res.status(500).json({ error: "Permission Not Removed" })
       )
       .catch((error) => res.status(500).json({ error }));

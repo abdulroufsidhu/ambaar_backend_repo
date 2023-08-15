@@ -52,7 +52,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
+          ? res.status(200).json({ business })
           : res.status(404).json({ message: "Business Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -61,7 +61,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromEmail(email)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
+          ? res.status(200).json({ business })
           : res.status(404).json({ message: "Business Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -70,7 +70,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromContact(contact)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
+          ? res.status(200).json({ business })
           : res.status(404).json({ message: "Business Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -79,7 +79,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromLicence(licence)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
+          ? res.status(200).json({ business })
           : res.status(404).json({ message: "Business Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -88,19 +88,19 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromName(name)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
+          ? res.status(200).json({ business })
           : res.status(404).json({ message: "Business Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
   }
 
-  return all()
-    .then((business) =>
-      business
-        ? res.status(201).json([...business])
-        : res.status(404).json({ message: "Business Not Found" })
-    )
-    .catch((error) => res.status(500).json({ error }));
+  // return all()
+  //   .then((business) =>
+  //     business
+  //       ? res.status(200).json([...business])
+  //       : res.status(404).json({ message: "Business Not Found" })
+  //   )
+  //   .catch((error) => res.status(500).json({ error }));
 
   return res.status(500).json({
     error:
@@ -110,7 +110,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
   return Business.findByIdAndUpdate(req.body._id, body)
-    .then((business) => res.status(201).json({ business }))
+    .then((business) => res.status(204).json({ business }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -119,8 +119,8 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
     return remove(id)
       .then((business) =>
         business
-          ? res.status(201).json({ business })
-          : res.status(500).json({ error: "Business Not Removed" })
+          ? res.status(200).json({ business })
+          : res.status(404).json({ error: "Business Not Removed" })
       )
       .catch((error) => res.status(500).json({ error }));
   }

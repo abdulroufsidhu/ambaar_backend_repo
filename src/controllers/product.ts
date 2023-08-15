@@ -59,7 +59,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IProduct = req.body;
   return Product.findByIdAndUpdate(req.body._id, body)
-    .then((product) => res.status(200).json({ product }))
+    .then((product) => res.status(204).json({ product }))
     .catch((error) => res.status(500).json({ error }));
 };
 

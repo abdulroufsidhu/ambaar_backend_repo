@@ -25,9 +25,9 @@ const fromEmail = async (email: string, password: string) =>
     !!!p
       ? undefined
       : User.findOne({ person: p._id, password: password })
-          .populate("person")
-          .exec()
-          .then((user) => user)
+        .populate("person")
+        .exec()
+        .then((user) => user)
   );
 
 const fromId = async (id: string) => User.findById(id).then((user) => user);
@@ -66,7 +66,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
   return fromEmail(email, password)
     .then((user) =>
       user
-        ? res.status(201).json({ _id: user._id, person: user.person })
+        ? res.status(200).json({ _id: user._id, person: user.person })
         : res.status(404).json({ message: "User Not Found" })
     )
     .catch((error) => res.status(500).json({ error }));
@@ -74,14 +74,14 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IUser = req.body;
   return User.findByIdAndUpdate(req.body._id, body)
-    .then((user) => res.status(201).json({ user }))
+    .then((user) => res.status(204).json({ user }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
   if (typeof id == "string") {
     return remove(id)
-      .then((user) => (user ? user : { error: "User Not Removed" }))
+      .then((user) => (user ? res.status(200).json({ user }) : { error: "User Not Removed" }))
       .catch((error) => res.status(500).json({ error }));
   }
   return res

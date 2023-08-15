@@ -55,7 +55,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((person) =>
         person
-          ? res.status(201).json({ person })
+          ? res.status(200).json({ person })
           : res.status(404).json({ message: "Person Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -64,7 +64,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromContact(contact)
       .then((person) =>
         person
-          ? res.status(201).json({ person })
+          ? res.status(200).json({ person })
           : res.status(404).json({ message: "Person Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -73,7 +73,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromNationalId(nationalId)
       .then((person) =>
         person
-          ? res.status(201).json({ person })
+          ? res.status(200).json({ person })
           : res.status(404).json({ message: "Person Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -82,7 +82,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromEmail(email)
       .then((person) =>
         person
-          ? res.status(201).json({ person })
+          ? res.status(200).json({ person })
           : res.status(404).json({ message: "Person Not Found" })
       )
       .catch((error) => res.status(500).json({ error }));
@@ -97,14 +97,14 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPerson = req.body;
   return Person.findByIdAndUpdate(req.body._id, body)
-    .then((person) => res.status(201).json({ person }))
+    .then((person) => res.status(204).json({ person }))
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
   if (typeof id == "string") {
     return remove(id)
-      .then((p) => (p ? p : { error: "Person Not Removed" }))
+      .then((p) => (p ? res.status(200).json({ person: p }) : { error: "Person Not Removed" }))
       .catch((error) => res.status(500).json({ error }));
   }
   return res
