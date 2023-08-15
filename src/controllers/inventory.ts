@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { IInventory, Inventory } from "../models";
+import { productController } from ".";
 
 const create = async (inventory: IInventory) => {
-  const i = new Inventory({ ...inventory })
-  return i.save().then(inv => inv);
+  return productController.create(inventory.product)
+    .then((product) =>
+      (new Inventory({ ...inventory, product: product._id }).save().then(inv => inv))
+    )
 }
 
 const fromId = async (id: string) => Inventory.findById(id).populate(["product", "branch"]).then(inv => inv);

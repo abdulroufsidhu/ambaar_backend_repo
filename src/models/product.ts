@@ -8,10 +8,11 @@ export interface IProduct {
   serialNumber: string;
   unitBuyPrice: number;
   unitSellPrice: number;
+  unitDescountPrice: number;
   quantity: number;
 }
 
-interface IProductModel extends IProduct, Document {}
+interface IProductModel extends IProduct, Document { }
 
 const ProductSchema: Schema = new Schema(
   {
@@ -22,6 +23,7 @@ const ProductSchema: Schema = new Schema(
     serialNumber: { type: String, required: true },
     unitBuyPrice: { type: Number, required: true },
     unitSellPrice: { type: Number, required: true },
+    unitDescountPrice: { type: Number },
     quantity: { type: Number, required: true },
   },
   { versionKey: false, timestamps: true }
