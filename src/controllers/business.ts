@@ -19,6 +19,7 @@ const create = (business: IBusiness, location: string, user_id: string) => {
         user: user_id as any,
         permissions: [],
       })
+        .then(() => business)
     )
   );
 };
