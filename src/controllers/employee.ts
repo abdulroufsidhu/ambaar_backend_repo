@@ -8,17 +8,35 @@ const create = async (employee: IEmployee) => {
 
 const fromId = async (id: string) =>
   Employee.findById(id)
-    .populate(["user", "branch", "permissions"])
+    .populate(["user", "permissions"])
+    .populate("-user.password")
+    .populate({
+      path: "user",
+      select: "-password",
+      populate: {
+        path: "person",
+        model: "Person",
+      },
+    })
     .then((e) => e);
 const fromUserId = async (id: string) =>
   Employee.find({ user: id })
-    .populate(["user", "branch", "permissions"])
+    .populate(["user", "permissions"])
+    .populate({
+      path: "user",
+      select: "-password",
+      populate: {
+        path: "person",
+        model: "Person",
+      },
+    })
     .then((e) => e);
 const fromBranchId = async (id: string) =>
   Employee.find({ branch: id })
-    .populate(["user", "branch", "permissions"])
+    .populate(["user", "permissions"])
     .populate({
       path: "user",
+      select: "-password",
       populate: {
         path: "person",
         model: "Person",
