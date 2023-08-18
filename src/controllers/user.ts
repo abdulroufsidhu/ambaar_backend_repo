@@ -6,31 +6,35 @@ import { Logger } from "../libraries/logger";
 const create = async (user: IUser) => {
   if (!!!user.person) return;
   if (!!!user.password) return;
-  return personController.create(user.person).then((person) =>
-    fromPerson(person._id)
-      .then((user) => user)
-      .catch((error) => {
-        Logger.d("user", `${error}`);
-        new User({ person, password: user.password })
-          .save()
-          .then((user) => user);
-      })
+  return personController.create(user.person).then((person) => fromPerson(person._id)
+    .then((user) => user)
+    .catch(() => {
+      return new User({ person, password: user.password })
+        .save()
+        .then((user) => {
+          return user;
+        });
+    })
+
   );
 };
 
 const fromPerson = async (person_id: string) =>
-  User.findOne({ person: person_id }).then((user) => user);
+  User.findOne({ person: person_id })
+    .select("-password").then((user) => { if (!!user) return user; throw new Error("User not found") });
 const fromEmail = async (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
       ? undefined
       : User.findOne({ person: p._id, password: password })
         .populate("person")
+        .select("-password")
         .exec()
         .then((user) => user)
   );
 
-const fromId = async (id: string) => User.findById(id).then((user) => user);
+const fromId = async (id: string) => User.findById(id)
+  .select("-password").then((user) => user);
 
 const remove = async (id: string) =>
   User.findByIdAndDelete(id).then((user) => user);
@@ -43,9 +47,7 @@ const createReq = async (req: Request, res: Response, next: NextFunction) => {
   Logger.w("User", req.body);
   return (
     create(body)
-      ?.then((user) =>
-        res.status(201).json({ _id: user?._id, person: user?.person })
-      )
+      ?.then((user) => res.status(201).json({ _id: user?._id, person: user?.person }))
       ?.catch((error) => res.status(500).json({ error })) ??
     res.status(500).json({ error: "User not created" })
   );
