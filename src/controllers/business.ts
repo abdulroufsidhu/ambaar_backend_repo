@@ -2,25 +2,34 @@ import { NextFunction, Request, Response } from "express";
 import { Business, IBusiness } from "../models";
 import { branchController } from ".";
 import { employeeController } from ".";
+import employee from "./employee";
 
 const create = (business: IBusiness, location: string, user_id: string) => {
   const b = new Business({ ...business });
-  return b.save().then(
-    (business) => branchController.create({
-      name: "Main",
-      contact: business.contact,
-      business: business._id,
-      email: business.email,
-      location: location,
-    }).then(
-      branch => employeeController.create({
-        branch: branch._id,
-        role: "founder",
-        user: user_id as any,
-        permissions: [],
+  return b.save().then((business) =>
+    branchController
+      .create({
+        name: "Main",
+        contact: business.contact,
+        business: business._id,
+        email: business.email,
+        location: location,
       })
-        .then(() => business)
-    )
+      .then((branch) =>
+        employeeController
+          .create({
+            branch: branch._id,
+            role: "founder",
+            user: user_id as any,
+            permissions: [],
+          })
+          .then((employee) =>
+            employee.populate({
+              path: "branch",
+              populate: { path: "business", model: "Business" },
+            })
+          )
+      )
   );
 };
 
@@ -55,7 +64,15 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
   return create(body, req.body.location, req.body.user_id)
-    .then((business) => res.status(201).json({ business }))
+    .then((employee) =>
+      res.status(201).json({
+        _id: employee._id,
+        user: employee.user,
+        branch: employee.branch,
+        role: employee.role,
+        permissions: employee.permissions,
+      })
+    )
     .catch((error) => res.status(500).json({ error }));
 };
 
