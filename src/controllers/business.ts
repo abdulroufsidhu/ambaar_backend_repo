@@ -4,32 +4,18 @@ import { branchController } from ".";
 import { employeeController } from ".";
 import employee from "./employee";
 
-const create = (business: IBusiness, location: string, user_id: string) => {
+const create = (business: IBusiness, location: string, userId: string) => {
   const b = new Business({ ...business });
   return b.save().then((business) =>
     branchController
-      .create({
+      .create(userId, {
         name: "Main",
         contact: business.contact,
         business: business._id,
         email: business.email,
         location: location,
       })
-      .then((branch) =>
-        employeeController
-          .create({
-            branch: branch._id,
-            role: "founder",
-            user: user_id as any,
-            permissions: [],
-          })
-          .then((employee) =>
-            employee.populate({
-              path: "branch",
-              populate: { path: "business", model: "Business" },
-            })
-          )
-      )
+      .then((res) => res)
   );
 };
 
@@ -144,7 +130,17 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
   return Business.findByIdAndUpdate(req.body._id, body)
-    .then((business) => res.status(204).json({ business }))
+    .populate("founder")
+    .then((business) =>
+      res.status(204).json({
+        _id: business?._id,
+        name: business?.name,
+        contact: business?.contact,
+        email: business?.email,
+        licence: business?.licence,
+        founder: business?.founder,
+      })
+    )
     .catch((error) => res.status(500).json({ error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -153,7 +149,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
     return remove(id)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
+          ? res.status(200).json({ _id: business._id })
           : res.status(404).json({ error: "Business Not Removed" })
       )
       .catch((error) => res.status(500).json({ error }));

@@ -1,9 +1,24 @@
 import { NextFunction, Request, Response } from "express";
 import { Branch, IBranch } from "../models";
+import { employeeController } from ".";
 
-const create = async (branch: IBranch) => {
+const create = async (userId: string, branch: IBranch) => {
   const b = new Branch({ ...branch });
-  return b.save().then((branch) => branch);
+  return b.save().then((branch) =>
+    employeeController
+      .create({
+        branch: branch._id,
+        role: "founder",
+        user: userId as any,
+        permissions: [],
+      })
+      .then((employee) =>
+        employee.populate({
+          path: "branch",
+          populate: { path: "business", model: "Business" },
+        })
+      )
+  );
 };
 
 const fromId = async (id: string) =>
@@ -27,8 +42,17 @@ const remove = async (id: string) =>
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
-  return create(body)
-    .then((branch) => res.status(201).json({ branch }))
+  const userId: string = req.body.user_id;
+  return create(userId, body)
+    .then((employee) =>
+      res.status(201).json({
+        _id: employee._id,
+        branch: employee.branch,
+        role: employee.role,
+        user: employee.user,
+        permissions: employee.permissions,
+      })
+    )
     .catch((error) => res.status(500).json({ error }));
 };
 
