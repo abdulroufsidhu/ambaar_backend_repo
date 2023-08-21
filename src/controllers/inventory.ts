@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IInventory, Inventory } from "../models";
 import { productController } from ".";
+import { Logger } from "../libraries/logger";
 
 const create = async (inventory: IInventory) => {
   return productController
@@ -8,7 +9,20 @@ const create = async (inventory: IInventory) => {
     .then((product) =>
       new Inventory({ ...inventory, product: product._id })
         .save()
-        .then((inv) => inv)
+        .then(
+          (inv) => inv.populate(
+            [
+              {
+                path: "branch",
+                populate: {
+                  path: "business",
+                  model: "Business",
+                },
+              },
+              { path: "product" }
+            ]
+          )
+        )
     );
 };
 
@@ -27,9 +41,8 @@ const fromBranch = async (branch_id: string) =>
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
-  console.info(body);
   return create(body)
-    .then((inventory) => res.status(201).json({ inventory }))
+    .then((inventory) => res.status(201).json({ _id: inventory._id, product: inventory.product, branch: inventory.branch }))
     .catch((error) => res.status(500).json({ error }));
 };
 
@@ -77,9 +90,13 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
-  return Inventory.findByIdAndUpdate(req.body._id, body)
-    .then((inventory) => res.status(204).json({ ...inventory }))
-    .catch((error) => res.status(500).json({ error }));
+  try {
+    const inventory = await productController.update(req.body.product._id, body.product)
+    // const inventory = await Inventory.findByIdAndUpdate(req.body._id, body, options)?.populate({ path: "product" });
+    return res.status(204).json({ ...inventory });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
 
 export default {

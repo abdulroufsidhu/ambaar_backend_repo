@@ -56,9 +56,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+const update = async (id: string, product: IProduct) => Product.findByIdAndUpdate(id, product).then(res => res)
+
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IProduct = req.body;
-  return Product.findByIdAndUpdate(req.body._id, body)
+  return update(req.body._id, body)
     .then((product) => res.status(204).json({ product }))
     .catch((error) => res.status(500).json({ error }));
 };
@@ -70,5 +72,6 @@ export default {
   fromSerial,
   createReq,
   readReq,
+  update,
   updateReq,
 };
