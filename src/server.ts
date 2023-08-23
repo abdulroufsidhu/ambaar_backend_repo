@@ -72,6 +72,8 @@ function startServer() {
     next();
   });
 
+
+  // TODO implement jwt (json web token) and then authenticate actions with permission
   // Routes
   server.use(routes.person, personRoutes);
   server.use(routes.users, userRoutes);

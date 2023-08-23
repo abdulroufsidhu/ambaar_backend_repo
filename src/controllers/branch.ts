@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Branch, IBranch } from "../models";
 import { employeeController } from ".";
+import { IPermission } from '../models/permission';
 
-const create = async (userId: string, branch: IBranch) => {
+const create = async (userId: string, branch: IBranch, permissions?: IPermission[]) => {
   const b = new Branch({ ...branch });
   return b.save().then((branch) =>
     employeeController
@@ -10,7 +11,7 @@ const create = async (userId: string, branch: IBranch) => {
         branch: branch._id,
         role: "founder",
         user: userId as any,
-        permissions: [],
+        permissions: permissions ?? [],
       })
       .then((employee) =>
         employee.populate({
@@ -43,7 +44,8 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
   const userId: string = req.body.user_id;
-  return create(userId, body)
+  const permissions: IPermission[] = req.body.permissions;
+  return create(userId, body, permissions)
     .then((employee) =>
       res.status(201).json({
         _id: employee._id,

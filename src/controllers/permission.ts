@@ -19,6 +19,10 @@ const createReq = async (req: Request, res: Response, next: NextFunction) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
+const readAll = async () => 
+  Permission.find().then((perm)=>perm)
+
+
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
   const name = req.query.name;
@@ -69,6 +73,7 @@ export default {
   remove,
   // TODO update,
   createReq,
+  readAll,
   readReq,
   updateReq,
   removeReq,

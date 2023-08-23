@@ -1,21 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import { Business, IBusiness } from "../models";
-import { branchController } from ".";
-import { employeeController } from ".";
-import employee from "./employee";
+import { branchController, permissionController } from ".";
 
 const create = (business: IBusiness, location: string, userId: string) => {
   const b = new Business({ ...business });
   return b.save().then((business) =>
-    branchController
-      .create(userId, {
-        name: "Main",
-        contact: business.contact,
-        business: business._id,
-        email: business.email,
-        location: location,
-      })
-      .then((res) => res)
+    permissionController.readAll().then((perms) =>
+      branchController
+        .create(
+          userId,
+          {
+            name: "Main",
+            contact: business.contact,
+            business: business._id,
+            email: business.email,
+            location: location,
+          },
+          perms
+        )
+        .then((res) => res)
+    )
   );
 };
 

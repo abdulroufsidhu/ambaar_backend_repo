@@ -6,6 +6,8 @@ const create = async (employee: IEmployee) => {
   return e.save().then((employee) => employee);
 };
 
+const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUpdate(id,employee)
+
 const fromId = async (id: string) =>
   Employee.findById(id)
     .populate(["user", "branch", "permissions"])
@@ -111,7 +113,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
-  return Employee.findByIdAndUpdate(req.body._id, body)
+  return update(req.body._id, body)
     .then((employee) => res.status(204).json({ employee }))
     .catch((error) => res.status(500).json({ error }));
 };
@@ -133,6 +135,7 @@ export default {
   // TODO update,
   createReq,
   readReq,
+  update,
   updateReq,
   removeReq,
 };
