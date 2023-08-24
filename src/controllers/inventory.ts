@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { IInventory, Inventory } from "../models";
 import { productController } from ".";
 import { Logger } from "../libraries/logger";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (inventory: IInventory) => {
   return productController
@@ -42,8 +43,8 @@ const fromBranch = async (branch_id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
   return create(body)
-    .then((inventory) => res.status(201).json({ _id: inventory._id, product: inventory.product, branch: inventory.branch }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((inventory) => successResponse({ res, data: inventory }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,8 +55,8 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((inventory) =>
         inventory
-          ? res.status(200).json({ inventory })
-          : res.status(404).json({ message: "no data found" })
+          ? successResponse({ res, data: inventory })
+          : errorResponse({ res, code: 404, message: "no data found", data: {} })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -64,39 +65,31 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       return fromProduct(product_id, branch_id)
         .then((inventory) =>
           inventory
-            ? res.status(200).json({ inventory })
-            : res.status(404).json({ message: "no data found" })
+            ? successResponse({ res, data: inventory })
+            : errorResponse({ res, code: 404, message: "no data found", data: {} })
         )
         .catch((error) => res.status(500).json({ error }));
     } else {
-      return res.status(500).json({
-        message: "Be sure to provide branch_id if you provide product_id",
-      });
+      return errorResponse({ res, message: "Be sure to provide branch_id if you provide product_id", data: {} })
     }
   }
   if (typeof branch_id === "string") {
     return fromBranch(branch_id)
       .then((inventory) =>
         inventory
-          ? res.status(200).json([...inventory])
-          : res.status(404).json({ message: "no data found" })
+          ? successResponse({ res, data: [...inventory] })
+          : errorResponse({ res, code: 404, message: "no data found", data: {} })
       )
       .catch((error) => res.status(500).json({ error }));
   }
-  return res
-    .status(500)
-    .json({ message: "Be sure to provide id, product_id or branch_id" });
+  return errorResponse({ res, message: "Be sure to provide id, product_id or branch_id", data: {} })
 };
 
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
-  try {
-    const inventory = await productController.update(req.body.product._id, body.product)
-    // const inventory = await Inventory.findByIdAndUpdate(req.body._id, body, options)?.populate({ path: "product" });
-    return res.status(204).json({ ...inventory });
-  } catch (error) {
-    return res.status(500).json({ error });
-  }
+  return productController.update(req.body.product._id, body.product)
+    .then(inventory => successResponse({ res, data: inventory }))
+    .catch(error => errorResponse({ res, data: error }));
 };
 
 export default {

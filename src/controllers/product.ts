@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Product, IProduct } from "../models";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (product: IProduct) => {
   const p = new Product({ ...product });
@@ -27,8 +28,8 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((product) =>
         product
-          ? res.status(200).json({ product })
-          : res.status(404).json({ message: "Product Not Found" })
+          ? successResponse({ res, data: product })
+          : errorResponse({ res, code: 404, message: "product not found", data: {} })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -36,33 +37,31 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromSerial(serial)
       .then((products) =>
         products
-          ? res.status(200).json([...products])
-          : res.status(404).json({ message: "Product Not Found" })
+          ? successResponse({ res, data: [...products] })
+          : errorResponse({ res, message: "product Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof name === "string") {
     return fromName(name)
       .then((products) =>
         products
-          ? res.status(200).json([...products])
-          : res.status(404).json({ message: "Product Not Found" })
+          ? successResponse({ res, data: [...products] })
+          : errorResponse({ res, message: "product Not Found", data: {} })
       )
       .catch((error) => res.status(500).json({ error }));
   }
-  return res.status(500).json({
-    error:
-      "Please make sure to provide, id, serial_number or name of the product",
-  });
+  return errorResponse({ res, message: "Please make sure to provide, id, serial_number or name of the product", data: {} });
 };
+
 
 const update = async (id: string, product: IProduct) => Product.findByIdAndUpdate(id, product).then(res => res)
 
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IProduct = req.body;
   return update(req.body._id, body)
-    .then((product) => res.status(204).json({ product }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((product) => successResponse({ res, data: product }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 export default {

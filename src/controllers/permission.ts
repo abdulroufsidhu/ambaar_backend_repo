@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Permission, IPermission } from "../models";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (permission: IPermission) => {
   const p = new Permission({ ...permission });
@@ -25,30 +26,27 @@ const readAll = async () =>
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
-  const name = req.query.name;
   if (typeof id == "string") {
     return fromId(id)
       .then((permission) =>
         permission
-          ? res.status(200).json({ permission })
-          : res.status(404).json({ message: "Branch Not Found" })
+          ? successResponse({ res, data: permission })
+          : errorResponse({ res, code: 404, message: "permission not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
-  if (typeof name == "string") {
-    return fromName(name)
-      .then((permissions) => res.status(200).json({ permissions }))
-      .catch((error) => res.status(500).json({ error }));
-  }
-  return res.status(500).json({
-    error: "Please make sure to id or name query parameter",
-  });
+  // if (typeof name == "string") {
+  //   return fromName(name)
+  //     .then((permission) => successResponse({ res, data: permission }))
+  //     .catch((error) => errorResponse({ res, data: error }));
+  // }
+  return errorResponse({ res, message: "id is missing", data: {} });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPermission = req.body;
   return Permission.findByIdAndUpdate(req.body._id, body)
-    .then((permission) => res.status(204).json({ permission }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((permission) => successResponse({ res, data: permission }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
@@ -56,14 +54,12 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
     return remove(id)
       .then((permission) =>
         permission
-          ? res.status(200).json({ permission })
-          : res.status(500).json({ error: "Permission Not Removed" })
+          ? successResponse({ res, data: permission })
+          : errorResponse({ res, message: "permission not removed", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
-  res
-    .status(500)
-    .json({ error: "Please make sure to provide id query parameter" });
+  return errorResponse({ res, message: "id is missing", data: {} });
 };
 
 export default {

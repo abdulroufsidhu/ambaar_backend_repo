@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Person, IPerson } from "../models";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (person: IPerson) => {
   const p = new Person({
@@ -42,8 +43,8 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPerson = req.body;
   return create(body)
-    .then((person) => res.status(201).json({ person }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((person) => successResponse({ res, data: person }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -55,37 +56,37 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((person) =>
         person
-          ? res.status(200).json({ person })
-          : res.status(404).json({ message: "Person Not Found" })
+          ? successResponse({ res, data: person })
+          : errorResponse({ res, code: 404, message: "person not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof contact == "string") {
     return fromContact(contact)
       .then((person) =>
         person
-          ? res.status(200).json({ person })
-          : res.status(404).json({ message: "Person Not Found" })
+          ? successResponse({ res, data: person })
+          : errorResponse({ res, code: 404, message: "person not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof nationalId == "string") {
     return fromNationalId(nationalId)
       .then((person) =>
         person
-          ? res.status(200).json({ person })
-          : res.status(404).json({ message: "Person Not Found" })
+          ? successResponse({ res, data: person })
+          : errorResponse({ res, code: 404, message: "person not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof email == "string") {
     return fromEmail(email)
       .then((person) =>
         person
-          ? res.status(200).json({ person })
-          : res.status(404).json({ message: "Person Not Found" })
+          ? successResponse({ res, data: person })
+          : errorResponse({ res, code: 404, message: "person not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   return res
     .status(500)
@@ -107,9 +108,7 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((p) => (p ? res.status(200).json({ person: p }) : { error: "Person Not Removed" }))
       .catch((error) => res.status(500).json({ error }));
   }
-  return res
-    .status(500)
-    .json({ error: "Please make sure to provide id query parameter" });
+  return errorResponse({ res, message: "id is missing", data: {} })
 };
 
 export default {

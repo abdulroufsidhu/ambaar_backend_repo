@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import personController from "./person";
 import { User, IUser } from "../models";
 import { Logger } from "../libraries/logger";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (user: IUser) => {
   if (!!!user.person) return;
@@ -12,7 +13,7 @@ const create = async (user: IUser) => {
       return new User({ person, password: user.password })
         .save()
         .then((user) => {
-          return user;
+          return fromId(user._id);
         });
     })
 
@@ -47,8 +48,8 @@ const createReq = async (req: Request, res: Response, next: NextFunction) => {
   Logger.w("User", req.body);
   return (
     create(body)
-      ?.then((user) => res.status(201).json({ _id: user?._id, person: user?.person }))
-      ?.catch((error) => res.status(500).json({ error })) ??
+      ?.then((user) => successResponse({ res, data: user }))
+      ?.catch((error) => errorResponse({ res, data: error })) ??
     res.status(500).json({ error: "User not created" })
   );
 };
@@ -59,36 +60,39 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 
   if (
     !!!email ||
+    typeof email != "string"
+  ) {
+    return errorResponse({ res, message: "email or passord is missing", data: {} });
+  }
+
+  if (
     !!!password ||
-    typeof email != "string" ||
     typeof password != "string"
   ) {
-    return res.status(500).json({ error: "email or password is missing" });
+    return errorResponse({ res, message: "password or passord is missing", data: {} });
   }
   return fromEmail(email, password)
     .then((user) =>
       user
-        ? res.status(200).json({ _id: user._id, person: user.person })
-        : res.status(404).json({ message: "User Not Found" })
+        ? successResponse({ res, data: user })
+        : errorResponse({ res, code: 404, message: "User not found", data: {} })
     )
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IUser = req.body;
   return User.findByIdAndUpdate(req.body._id, body)
-    .then((user) => res.status(204).json({ user }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((user) => successResponse({ res, code: 204, data: user }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
   if (typeof id == "string") {
     return remove(id)
-      .then((user) => (user ? res.status(200).json({ user }) : { error: "User Not Removed" }))
-      .catch((error) => res.status(500).json({ error }));
+      .then((user) => (user ? successResponse({ res, data: user }) : { error: "User Not Removed" }))
+      .catch((error) => errorResponse({ res, data: error }));
   }
-  return res
-    .status(500)
-    .json({ error: "Please make sure to provide id query parameter" });
+  return errorResponse({ res, message: "Please make sure to provide id query parameter", data: {} })
 };
 
 export default {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { Branch, IBranch } from "../models";
+import { Branch, IBranch, IPermission } from "../models";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 import { employeeController } from ".";
-import { IPermission } from '../models/permission';
 
 const create = async (userId: string, branch: IBranch, permissions?: IPermission[]) => {
   const b = new Branch({ ...branch });
@@ -43,19 +43,11 @@ const remove = async (id: string) =>
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
-  const userId: string = req.body.user_id;
-  const permissions: IPermission[] = req.body.permissions;
+  const userId: string = req.body.user._id;
+  const permissions: IPermission[] = req.body.permissions
   return create(userId, body, permissions)
-    .then((employee) =>
-      res.status(201).json({
-        _id: employee._id,
-        branch: employee.branch,
-        role: employee.role,
-        user: employee.user,
-        permissions: employee.permissions,
-      })
-    )
-    .catch((error) => res.status(500).json({ error }));
+    .then((branch) => successResponse({ res, data: branch }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 // const readFromBusinessId = async (req: Request, res: Response, next: NextFunction) => fromBusinessId(req.query.business_id)
@@ -68,37 +60,37 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((branch) =>
         branch
-          ? res.status(200).json({ branch })
-          : res.status(404).json({ message: "Branch Not Found" })
+          ? successResponse({ res, data: branch })
+          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof business_id == "string") {
     return fromBusinessId(business_id)
       .then((branch) =>
         branch
           ? res.status(200).json([...branch])
-          : res.status(404).json({ message: "Branch Not Found" })
+          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof email == "string") {
     return fromEmail(email)
       .then((branch) =>
         branch
-          ? res.status(200).json({ branch })
-          : res.status(404).json({ message: "Branch Not Found" })
+          ? successResponse({ res, data: branch })
+          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof contact == "string") {
     return fromContact(contact)
       .then((branch) =>
         branch
-          ? res.status(200).json({ branch })
-          : res.status(404).json({ message: "Branch Not Found" })
+          ? successResponse({ res, data: branch })
+          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   return res.status(500).json({
     error:
@@ -108,18 +100,18 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
   return Branch.findByIdAndUpdate(req.body._id, body)
-    .then((branch) => res.status(204).json({ branch }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((branch) => successResponse({ res, data: branch }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.params.id;
   return remove(id)
     .then((branch) =>
       branch
-        ? res.status(200).json({ branch })
-        : res.status(500).json({ error: "Branch Not Removed" })
+        ? successResponse({ res, data: branch })
+        : errorResponse({ res, message: "Branch No Removed", data: {} })
     )
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 export default {

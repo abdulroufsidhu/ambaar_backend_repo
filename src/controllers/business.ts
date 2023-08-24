@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Business, IBusiness } from "../models";
 import { branchController, permissionController } from ".";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = (business: IBusiness, location: string, userId: string) => {
   const b = new Business({ ...business });
@@ -54,16 +55,8 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
   return create(body, req.body.location, req.body.user_id)
-    .then((employee) =>
-      res.status(201).json({
-        _id: employee._id,
-        user: employee.user,
-        branch: employee.branch,
-        role: employee.role,
-        permissions: employee.permissions,
-      })
-    )
-    .catch((error) => res.status(500).json({ error }));
+    .then((employee) => successResponse({ res, data: employee }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -76,76 +69,64 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
-          : res.status(404).json({ message: "Business Not Found" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof email == "string") {
     return fromEmail(email)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
-          : res.status(404).json({ message: "Business Not Found" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof contact == "string") {
     return fromContact(contact)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
-          : res.status(404).json({ message: "Business Not Found" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof licence == "string") {
     return fromLicence(licence)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
-          : res.status(404).json({ message: "Business Not Found" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof name == "string") {
     return fromName(name)
       .then((business) =>
         business
-          ? res.status(200).json({ business })
-          : res.status(404).json({ message: "Business Not Found" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
 
   // return all()
   //   .then((business) =>
   //     business
-  //       ? res.status(200).json([...business])
-  //       : res.status(404).json({ message: "Business Not Found" })
+  //       ? successResponse({ res, data: [...business] })
+  //       : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
   //   )
-  //   .catch((error) => res.status(500).json({ error }));
+  //   .catch((error) => errorResponse({ res, data: error }));
 
-  return res.status(500).json({
-    error:
-      "Please make sure to provide id, contact, licence or email query parameter",
-  });
+  return errorResponse({ res, message: "Please make sure to provide id, contact, licence or email query parameter", data: {} })
+
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;
   return Business.findByIdAndUpdate(req.body._id, body)
-    .populate("founder")
-    .then((business) =>
-      res.status(204).json({
-        _id: business?._id,
-        name: business?.name,
-        contact: business?.contact,
-        email: business?.email,
-        licence: business?.licence,
-        founder: business?.founder,
-      })
-    )
-    .catch((error) => res.status(500).json({ error }));
+    .then((business) => res.status(204).json({ business }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.query.id;
@@ -153,10 +134,10 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
     return remove(id)
       .then((business) =>
         business
-          ? res.status(200).json({ _id: business._id })
-          : res.status(404).json({ error: "Business Not Removed" })
+          ? successResponse({ res, data: business })
+          : errorResponse({ res, message: "Business Not Removed", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   res
     .status(500)

@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { Employee, IEmployee } from "../models";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 const create = async (employee: IEmployee) => {
   const e = new Employee({ ...employee });
   return e.save().then((employee) => employee);
 };
 
-const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUpdate(id,employee)
+const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUpdate(id, employee)
 
 const fromId = async (id: string) =>
   Employee.findById(id)
@@ -72,8 +73,8 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
   return create(body)
-    .then((employee) => res.status(201).json({ employee }))
-    .catch((error) => res.status(500).json({ error }));
+    .then((employee) => successResponse({ res, data: employee }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -84,48 +85,46 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromId(id)
       .then((employee) =>
         employee
-          ? res.status(200).json({ employee })
-          : res.status(404).json({ message: "Employee Not Found" })
+          ? successResponse({ res, data: employee })
+          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof uid == "string") {
     return fromUserId(uid)
       .then((employee) =>
         employee
           ? res.status(200).json([...employee])
-          : res.status(404).json({ message: "Employee Not Found" })
+          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
   if (typeof branchId == "string") {
     return fromBranchId(branchId)
       .then((employee) =>
         employee
           ? res.status(200).json([...employee])
-          : res.status(404).json({ message: "Employee Not Found" })
+          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
       )
-      .catch((error) => res.status(500).json({ error }));
+      .catch((error) => errorResponse({ res, data: error }));
   }
-  return res.status(500).json({
-    error: "Please make sure to provide id, uid or branch_id query parameter",
-  });
+  return errorResponse({ res, message: "Please make sure to provide id, uid or branch_id query parameter", data: {} })
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
-  return update(req.body._id, body)
-    .then((employee) => res.status(204).json({ employee }))
-    .catch((error) => res.status(500).json({ error }));
+  return Employee.findByIdAndUpdate(req.body._id, body)
+    .then((employee) => successResponse({ res, data: employee }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   const id = req.params.id;
   return remove(id)
     .then((employee) =>
       employee
-        ? res.status(200).json({ employee })
-        : res.status(500).json({ error: "Employee Not Removed" })
+        ? successResponse({ res, data: employee })
+        : errorResponse({ res, message: "employee not removed", data: {} })
     )
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 export default {
