@@ -94,7 +94,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromUserId(uid)
       .then((employee) =>
         employee
-          ? res.status(200).json([...employee])
+          ? successResponse({ res, data: [...employee] })
           : errorResponse({ res, code: 404, message: "employee not found", data: {} })
       )
       .catch((error) => errorResponse({ res, data: error }));
@@ -103,7 +103,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     return fromBranchId(branchId)
       .then((employee) =>
         employee
-          ? res.status(200).json([...employee])
+          ? successResponse({ res, data: [...employee] })
           : errorResponse({ res, code: 404, message: "employee not found", data: {} })
       )
       .catch((error) => errorResponse({ res, data: error }));
