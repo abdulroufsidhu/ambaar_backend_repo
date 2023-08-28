@@ -6,6 +6,7 @@ import personController from "./person";
 import userController from "./user";
 import productController from "./product";
 import inventoryController from "./inventory";
+import operationController from "./operation"
 
 export {
   branchController,
@@ -16,4 +17,5 @@ export {
   userController,
   productController,
   inventoryController,
+  operationController,
 };

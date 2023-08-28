@@ -8,6 +8,7 @@ export interface IEmployee {
   branch: IBranch;
   role: string;
   permissions: Array<IPermission>;
+  status: string;
 }
 
 interface IEmployeeModel extends IEmployee, Document {}
@@ -21,6 +22,7 @@ const EmployeeSchema: Schema = new Schema(
       type: Array<mongoose.Types.ObjectId>,
       ref: "Permission",
     },
+    status: { type: String, required: true, enum: ["active", "inactive"] }
   },
   { versionKey: false, timestamps: true }
 );

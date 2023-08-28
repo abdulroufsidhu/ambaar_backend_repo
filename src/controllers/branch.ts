@@ -12,6 +12,7 @@ const create = async (userId: string, branch: IBranch, permissions?: IPermission
         role: "founder",
         user: userId as any,
         permissions: permissions ?? [],
+        status: 'active',
       })
       .then((employee) =>
         employee.populate({

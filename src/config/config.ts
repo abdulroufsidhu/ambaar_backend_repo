@@ -9,4 +9,7 @@ export const config = {
   Server: {
     port: Number(process.env.PORT) || 1337,
   },
+  JWT: {
+    key: process.env.JWT_SECRET || "",
+  }
 };

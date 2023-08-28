@@ -1,10 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IPerson } from "./person";
 import uniqueValidator from "mongoose-unique-validator";
+import { string } from "joi";
 
 export interface IUser {
   person: IPerson;
   password: string;
+  token?: string;
 }
 
 interface IUserModel extends IUser, Document {}
@@ -18,7 +20,8 @@ const UserSchema: Schema = new Schema(
       unique: true,
       trim: true,
     },
-    password: { type: String, required: true },
+    token: { type: String },
+    password: { type: String, required: true, select: false },
   },
   { versionKey: false, timestamps: true }
 );

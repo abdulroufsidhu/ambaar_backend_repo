@@ -5,14 +5,9 @@ export interface IProduct {
   detail: string;
   colour: string;
   variant: string;
-  serialNumber: string;
-  unitBuyPrice: number;
-  unitSellPrice: number;
-  unitDescountPrice: number;
-  quantity: number;
 }
 
-interface IProductModel extends IProduct, Document { }
+interface IProductModel extends IProduct, Document {}
 
 const ProductSchema: Schema = new Schema(
   {
@@ -20,13 +15,15 @@ const ProductSchema: Schema = new Schema(
     detail: { type: String },
     colour: { type: String },
     variant: { type: String },
-    serialNumber: { type: String, required: true },
-    unitBuyPrice: { type: Number, required: true },
-    unitSellPrice: { type: Number, required: true },
-    unitDescountPrice: { type: Number },
-    quantity: { type: Number, required: true },
   },
   { versionKey: false, timestamps: true }
 );
+
+ProductSchema.index({
+  name: "text",
+  detail: "text",
+  colour: "text",
+  variant: "text",
+});
 
 export default mongoose.model<IProductModel>("Product", ProductSchema);

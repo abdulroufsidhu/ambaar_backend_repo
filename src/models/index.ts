@@ -6,6 +6,7 @@ import Person, { IPerson } from "./person";
 import User, { IUser } from "./user";
 import Product, { IProduct } from "./product";
 import Inventory, { IInventory } from "./inventory";
+import Operation, { IOperation } from './operation';
 
 export {
   Branch,
@@ -24,4 +25,6 @@ export {
   IProduct,
   Inventory,
   IInventory,
+  Operation,
+  IOperation,
 };

@@ -7,4 +7,5 @@ export default {
   permissions: "/permissions",
   products: "/products",
   inventory: "/inventory",
+  operation: "/operation"
 }

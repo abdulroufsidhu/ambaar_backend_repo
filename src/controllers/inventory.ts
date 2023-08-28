@@ -3,29 +3,35 @@ import { IInventory, Inventory } from "../models";
 import { productController } from ".";
 import { Logger } from "../libraries/logger";
 import { errorResponse, successResponse } from "../libraries/unified_response";
+import { UpdateQuery } from "mongoose";
 
 const create = async (inventory: IInventory) => {
-  return productController
-    .create(inventory.product)
-    .then((product) =>
-      new Inventory({ ...inventory, product: product._id })
-        .save()
-        .then(
-          (inv) => inv.populate(
-            [
-              {
-                path: "branch",
-                populate: {
-                  path: "business",
-                  model: "Business",
-                },
-              },
-              { path: "product" }
-            ]
-          )
-        )
-    );
+  return productController.create(inventory.product).then((product) =>
+    new Inventory({ ...inventory, product: product._id }).save().then((inv) =>
+      inv.populate([
+        {
+          path: "branch",
+          populate: {
+            path: "business",
+            model: "Business",
+          },
+        },
+        { path: "product" },
+      ])
+    )
+  );
 };
+
+const increamentQuantity = async (id: string, increament: number) =>
+  Inventory.findByIdAndUpdate(
+    id,
+    { $inc: { quantity: increament } },
+    { new: true }
+  )
+    .then((res) => res);
+
+const update = async (id: string, inventory: IInventory) =>
+  Inventory.findByIdAndUpdate(id, inventory, { new: true }).then((res) => res);
 
 const fromId = async (id: string) =>
   Inventory.findById(id)
@@ -56,7 +62,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((inventory) =>
         inventory
           ? successResponse({ res, data: inventory })
-          : errorResponse({ res, code: 404, message: "no data found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "no data found",
+              data: {},
+            })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -66,11 +77,20 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         .then((inventory) =>
           inventory
             ? successResponse({ res, data: inventory })
-            : errorResponse({ res, code: 404, message: "no data found", data: {} })
+            : errorResponse({
+                res,
+                code: 404,
+                message: "no data found",
+                data: {},
+              })
         )
         .catch((error) => res.status(500).json({ error }));
     } else {
-      return errorResponse({ res, message: "Be sure to provide branch_id if you provide product_id", data: {} })
+      return errorResponse({
+        res,
+        message: "Be sure to provide branch_id if you provide product_id",
+        data: {},
+      });
     }
   }
   if (typeof branch_id === "string") {
@@ -78,18 +98,28 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((inventory) =>
         inventory
           ? successResponse({ res, data: [...inventory] })
-          : errorResponse({ res, code: 404, message: "no data found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "no data found",
+              data: {},
+            })
       )
       .catch((error) => res.status(500).json({ error }));
   }
-  return errorResponse({ res, message: "Be sure to provide id, product_id or branch_id", data: {} })
+  return errorResponse({
+    res,
+    message: "Be sure to provide id, product_id or branch_id",
+    data: {},
+  });
 };
 
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
-  return productController.update(req.body.product._id, body.product)
-    .then(inventory => successResponse({ res, data: inventory }))
-    .catch(error => errorResponse({ res, data: error }));
+  return productController
+    .update(req.body.product._id, body.product)
+    .then((inventory) => successResponse({ res, data: inventory }))
+    .catch((error) => errorResponse({ res, data: error }));
 };
 
 export default {
@@ -97,6 +127,8 @@ export default {
   fromId,
   fromProduct,
   fromBranch,
+  update,
+  increamentQuantity,
   createReq,
   readReq,
   updateReq,

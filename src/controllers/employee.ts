@@ -29,7 +29,7 @@ const fromId = async (id: string) =>
     })
     .then((e) => e);
 const fromUserId = async (id: string) =>
-  Employee.find({ user: id })
+  Employee.find({ user: id, status: 'active' })
     .populate(["user", "branch", "permissions"])
     .populate({
       path: "user",
@@ -68,7 +68,7 @@ const fromBranchId = async (id: string) =>
     .then((e) => e);
 
 const remove = async (id: string) =>
-  Employee.findByIdAndDelete(id).then((e) => e);
+  Employee.findByIdAndUpdate(id, {status: 'inactive'}).then((e) => e);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;

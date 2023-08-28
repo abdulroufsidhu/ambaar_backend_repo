@@ -14,6 +14,7 @@ import {
   productRoutes,
   routes,
   inventoryRoutes,
+  operationRoutes,
 } from "./routes";
 
 const server = express();
@@ -83,6 +84,7 @@ function startServer() {
   server.use(routes.permissions, permissionRoutes);
   server.use(routes.products, productRoutes);
   server.use(routes.inventory, inventoryRoutes);
+  server.use(routes.operation, operationRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));
