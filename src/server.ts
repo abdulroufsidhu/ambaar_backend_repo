@@ -16,6 +16,7 @@ import {
   inventoryRoutes,
   operationRoutes,
 } from "./routes";
+import { authenticator } from "./middleware/authenticator";
 
 const server = express();
 
@@ -78,13 +79,13 @@ function startServer() {
   // Routes
   server.use(routes.person, personRoutes);
   server.use(routes.users, userRoutes);
-  server.use(routes.businesses, businessRoutes);
-  server.use(routes.branches, branchRoutes);
+  server.use(routes.businesses, authenticator, businessRoutes);
+  server.use(routes.branches, authenticator, branchRoutes);
   server.use(routes.employees, employeeRoutes);
-  server.use(routes.permissions, permissionRoutes);
-  server.use(routes.products, productRoutes);
-  server.use(routes.inventory, inventoryRoutes);
-  server.use(routes.operation, operationRoutes);
+  server.use(routes.permissions, authenticator, permissionRoutes);
+  server.use(routes.products, authenticator, productRoutes);
+  server.use(routes.inventory, authenticator, inventoryRoutes);
+  server.use(routes.operation, authenticator, operationRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

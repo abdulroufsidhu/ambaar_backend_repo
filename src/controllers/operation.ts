@@ -4,6 +4,8 @@ import { inventoryController } from ".";
 import { Logger } from "../libraries/logger";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { personController } from ".";
+import mongoose from "mongoose";
+import operation from "../models/operation";
 
 const create = async (operation: IOperation) => {
   return personController.create(operation.person).then((person) =>
@@ -26,14 +28,59 @@ const fromId = async (id: string) =>
     .populate("inventory.branch")
     .populate("employee.user")
     .then((inv) => inv);
-const fromBranch = async (branchId: string) =>
-  Operation.find({
-    "inventory.branch": branchId,
-  })
-    .populate("inventory.branch")
-    .populate("employee.user")
-    .exec()
-    .then((operations) => [...operations]);
+const fromBranch = (branchId: string) => Operation.aggregate([
+  {
+    $lookup: {
+      from: 'inventory', // Replace with the actual name of your Inventory collection
+      localField: 'inventory',
+      foreignField: '_id',
+      as: 'inventory',
+    },
+  },
+  {
+    $unwind: '$inventory',
+  },
+  {
+    $lookup: {
+      from: 'branch', // Replace with the actual name of your Branch collection
+      localField: 'inventory.branch',
+      foreignField: '_id',
+      as: 'inventory.branch',
+    },
+  },
+  {
+    $unwind: '$inventory.branch',
+  },
+  {
+    $match: {
+      'inventory.branch._id': new mongoose.Types.ObjectId(branchId),
+    },
+  },
+  {
+    $lookup: {
+      from: 'employee', // Replace with the actual name of your Employee collection
+      localField: 'employee',
+      foreignField: '_id',
+      as: 'employee',
+    },
+  },
+  {
+    $lookup: {
+      from: 'person', // Replace with the actual name of your Person collection
+      localField: 'person',
+      foreignField: '_id',
+      as: 'person',
+    },
+  },
+]);
+
+// Operation.find({
+//   "inventory.branch": branchId,
+// })
+//   .populate("inventory.branch")
+//   .populate("employee.user")
+//   .exec()
+//   .then((operations) => [...operations]);
 const fromProduct = async (branchId: string, productName: string) =>
   Operation.find({
     "inventory.branch": branchId,
@@ -79,11 +126,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         operation
           ? successResponse({ res, data: operation })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -94,11 +141,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
           operation
             ? successResponse({ res, data: operation })
             : errorResponse({
-                res,
-                code: 404,
-                message: "no data found",
-                data: {},
-              })
+              res,
+              code: 404,
+              message: "no data found",
+              data: {},
+            })
         )
         .catch((error) => res.status(500).json({ error }));
     } else {
@@ -110,16 +157,17 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
     }
   }
   if (typeof branchId === "string") {
+    Logger.i('operation', "finding for branch id")
     return fromBranch(branchId)
       .then((operation) =>
         operation
           ? successResponse({ res, data: [...operation] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -129,11 +177,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         operation
           ? successResponse({ res, data: [...operation] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -143,11 +191,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         operation
           ? successResponse({ res, data: [...operation] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -157,11 +205,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         operation
           ? successResponse({ res, data: [...operation] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -171,11 +219,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         operation
           ? successResponse({ res, data: [...operation] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
