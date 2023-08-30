@@ -44,7 +44,7 @@ const remove = async (id: string) =>
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
-  const userId: string = req.body.user._id;
+  const userId: string = req.body.employee.user._id;
   const permissions: IPermission[] = req.body.permissions
   return create(userId, body, permissions)
     .then((branch) => successResponse({ res, data: branch }))

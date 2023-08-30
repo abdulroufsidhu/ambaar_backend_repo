@@ -4,6 +4,7 @@ import { IEmployee, IUser } from "../models";
 import { config } from "../config/config";
 import { employeeController, permissionController } from "../controllers";
 import { errorResponse } from "../libraries/unified_response";
+import { Logger } from "../libraries/logger";
 
 export const authenticator = async (req: Request, res: Response, next: NextFunction) => {
   // Get the JWT token from the request headers
@@ -19,19 +20,40 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
     const decoded = jwt.verify(token, config.JWT.key) as IUser; // Verify the token Replace 'your-secret-key' with your actual secret key
     // req.body.user = decoded; // Attach the decoded user to the request object
 
-    if (!jobId || !decoded) {
-      return errorResponse({ res, code: 401, message: "un_autherized Black Vigo comming for you...", data: {} })
+    const openUrls = [
+      "/businesses/create"
+    ]
+
+    let unProtectedUrl = false
+
+    openUrls.forEach(openUrl => {
+      if (openUrl.includes(req.originalUrl)) {
+        unProtectedUrl = openUrl === req.originalUrl
+      }
+    })
+
+
+    if (unProtectedUrl) {
+      next();
+    } else {
+
+      if (!jobId || !decoded) {
+        throw new Error(`jobIdValidation: ${!!jobId}, tokenValidation: ${!!decoded}`)
+      }
+
+      const employee = await employeeController.fromId(jobId);
+      const permitted = employee?.permissions?.filter(perm => perm.name === req.originalUrl)
+
+      if (!employee || !permitted || permitted.length < 1) {
+        throw new Error(`validEmployee: ${!!employee}, accessPermit: ${!!permitted && permitted.length > 0}`)
+      }
+
+      req.body.employee = employee
+      next(); // Proceed to the next middleware or route handler
+
     }
 
-    const employee = await employeeController.fromId(jobId);
-
-    if (!employee) {
-      return errorResponse({ res, code: 401, message: "un_autherized Black Vigo comming for you...", data: {} })
-    }
-
-    req.body.employee = employee
-    next(); // Proceed to the next middleware or route handler
   } catch (error) {
-    return errorResponse({ res, code: 401, message: "un_autherized Black Vigo comming for you...", data: {} })
+    return errorResponse({ res, code: 401, message: "un_autherized Black Vigo comming for you...", data: { error } })
   }
 };

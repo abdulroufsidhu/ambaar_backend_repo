@@ -11,64 +11,67 @@ const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUp
 
 const fromId = async (id: string) =>
   Employee.findById(id)
-    .populate(["user", "branch", "permissions"])
-    .populate({
-      path: "user",
-      select: "-password",
-      populate: {
-        path: "person",
-        model: "Person",
+    .populate([
+      {
+        path: "user",
+        select: "-password -token",
+        populate: {
+          path: "person",
+          model: "Person",
+        },
       },
-    })
-    .populate({
-      path: "branch",
-      populate: {
-        path: "business",
-        model: "Business",
+      {
+        path: "branch",
+        populate: {
+          path: "business",
+          model: "Business",
+        },
       },
-    })
+    ])
     .then((e) => e);
 const fromUserId = async (id: string) =>
   Employee.find({ user: id, status: 'active' })
-    .populate(["user", "branch", "permissions"])
-    .populate({
-      path: "user",
-      select: "-password",
-      populate: {
-        path: "person",
-        model: "Person",
+    .populate([
+      {
+        path: "user",
+        select: "-password -token",
+        populate: {
+          path: "person",
+          model: "Person",
+        },
       },
-    })
-    .populate({
-      path: "branch",
-      populate: {
-        path: "business",
-        model: "Business",
+      {
+        path: "branch",
+        populate: {
+          path: "business",
+          model: "Business",
+        },
       },
-    })
+    ])
     .then((e) => e);
 const fromBranchId = async (id: string) =>
   Employee.find({ branch: id })
-    .populate(["user", "branch", "permissions"])
-    .populate({
-      path: "user",
-      select: "-password",
-      populate: {
-        path: "person",
-        model: "Person",
+    .populate([
+      {
+        path: "user",
+        select: "-password -token",
+        populate: {
+          path: "person",
+          model: "Person",
+        },
       },
-    })
-    .populate({
-      path: "branch",
-      populate: {
-        path: "business",
-        model: "Business",
+      {
+        path: "branch",
+        populate: {
+          path: "business",
+          model: "Business",
+        },
       },
-    })
+    ])
     .then((e) => e);
 
 const remove = async (id: string) =>
-  Employee.findByIdAndUpdate(id, {status: 'inactive'}).then((e) => e);
+  Employee.findByIdAndUpdate(id, { status: 'inactive' }).then((e) => e);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
