@@ -20,6 +20,8 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
     const decoded = jwt.verify(token, config.JWT.key) as IUser; // Verify the token Replace 'your-secret-key' with your actual secret key
     // req.body.user = decoded; // Attach the decoded user to the request object
 
+    const currentUrl = req.originalUrl.split('?')[0]
+
     const openUrls = [
       "/businesses/create",
       "/permissions/get",
@@ -28,8 +30,8 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
     let unProtectedUrl = false
 
     openUrls.forEach(openUrl => {
-      if (openUrl.includes(req.originalUrl)) {
-        unProtectedUrl = openUrl === req.originalUrl
+      if (openUrl.includes(currentUrl)) {
+        unProtectedUrl = openUrl === currentUrl
       }
     })
 
@@ -43,7 +45,7 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
       }
 
       const employee = await employeeController.fromId(jobId);
-      const permitted = employee?.permissions?.filter(perm => perm.name === req.originalUrl)
+      const permitted = employee?.permissions?.filter(perm => perm.name == currentUrl)
 
       if (!employee || !permitted || permitted.length < 1) {
         throw new Error(`validEmployee: ${!!employee}, accessPermit: ${!!permitted && permitted.length > 0}`)
