@@ -11,6 +11,7 @@ const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUp
 
 const fromId = async (id: string) =>
   Employee.findById(id)
+    .populate("permissions")
     .populate([
       {
         path: "user",
@@ -31,6 +32,7 @@ const fromId = async (id: string) =>
     .then((e) => e);
 const fromUserId = async (id: string) =>
   Employee.find({ user: id, status: 'active' })
+  .populate("permissions")
     .populate([
       {
         path: "user",
@@ -50,7 +52,8 @@ const fromUserId = async (id: string) =>
     ])
     .then((e) => e);
 const fromBranchId = async (id: string) =>
-  Employee.find({ branch: id })
+  Employee.find({ branch: id, status: "active" })
+    .populate("permissions")
     .populate([
       {
         path: "user",
