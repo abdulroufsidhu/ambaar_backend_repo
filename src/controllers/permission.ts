@@ -20,8 +20,8 @@ const createReq = async (req: Request, res: Response, next: NextFunction) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
-const readAll = async () => 
-  Permission.find().then((perm)=>perm)
+const readAll = async () =>
+  Permission.find().then((perm) => perm)
 
 
 const readReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +40,8 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
   //     .then((permission) => successResponse({ res, data: permission }))
   //     .catch((error) => errorResponse({ res, data: error }));
   // }
-  return errorResponse({ res, message: "id is missing", data: {} });
+  return readAll().then(permissions => successResponse({ res, data: permissions }))
+  // return errorResponse({ res, message: "id is missing", data: {} });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IPermission = req.body;

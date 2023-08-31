@@ -21,7 +21,8 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
     // req.body.user = decoded; // Attach the decoded user to the request object
 
     const openUrls = [
-      "/businesses/create"
+      "/businesses/create",
+      "/permissions/get",
     ]
 
     let unProtectedUrl = false
