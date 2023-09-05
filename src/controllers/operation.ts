@@ -5,7 +5,6 @@ import { Logger } from "../libraries/logger";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { personController } from ".";
 import mongoose from "mongoose";
-import operation from "../models/operation";
 
 const create = async (operation: IOperation) => {
   return personController.create(operation.person).then((person) =>
@@ -31,7 +30,7 @@ const fromId = async (id: string) =>
 const fromBranch = (branchId: string) => Operation.aggregate([
   {
     $lookup: {
-      from: 'inventory', // Replace with the actual name of your Inventory collection
+      from: 'inventories', // Replace with the actual name of your Inventory collection
       localField: 'inventory',
       foreignField: '_id',
       as: 'inventory',
@@ -42,7 +41,7 @@ const fromBranch = (branchId: string) => Operation.aggregate([
   },
   {
     $lookup: {
-      from: 'branch', // Replace with the actual name of your Branch collection
+      from: 'branches', // Replace with the actual name of your Branch collection
       localField: 'inventory.branch',
       foreignField: '_id',
       as: 'inventory.branch',
@@ -52,25 +51,42 @@ const fromBranch = (branchId: string) => Operation.aggregate([
     $unwind: '$inventory.branch',
   },
   {
+    $lookup: {
+      from: 'products', // Replace with the actual name of your Branch collection
+      localField: 'inventory.product',
+      foreignField: '_id',
+      as: 'inventory.product',
+    },
+  },
+  {
+    $unwind: '$inventory.product',
+  },
+  {
     $match: {
       'inventory.branch._id': new mongoose.Types.ObjectId(branchId),
     },
   },
   {
     $lookup: {
-      from: 'employee', // Replace with the actual name of your Employee collection
+      from: 'employees', // Replace with the actual name of your Employee collection
       localField: 'employee',
       foreignField: '_id',
       as: 'employee',
     },
   },
   {
+    $unwind: '$employee',
+  },
+  {
     $lookup: {
-      from: 'person', // Replace with the actual name of your Person collection
+      from: 'people', // Replace with the actual name of your Person collection
       localField: 'person',
       foreignField: '_id',
       as: 'person',
     },
+  },
+  {
+    $unwind: '$person',
   },
 ]);
 

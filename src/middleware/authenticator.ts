@@ -52,7 +52,7 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
 
       Logger.d('authenticator employee', employee)
       
-      const permitted = employee?.permissions?.filter(perm => perm.name == currentUrl)
+      const permitted = employee?.permissions?.filter(perm => { Logger.d('authenticator', `${perm.name}==${currentUrl}` ); return perm.name == currentUrl})
       Logger.d('authenticator permitted', !!permitted)
       Logger.d('authenticator permitted', permitted)
 
