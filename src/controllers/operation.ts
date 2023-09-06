@@ -8,25 +8,37 @@ import mongoose from "mongoose";
 
 const create = async (operation: IOperation) => {
   return personController.create(operation.person).then((person) =>
-    Operation.create({ ...operation, person: person._id }).then((res) => {
-      const increament =
-        operation.action === "sale" ? -operation.quantity : operation.quantity;
-      Logger.i("operation remainingQuantity", increament);
-      return inventoryController
-        .increamentQuantity(operation.inventory._id, increament)
-        .then((inv) => {
-          Logger.i("operation", inv);
-          return res;
-        });
-    })
+    Operation.create({ ...operation, person: person._id }).then((res) =>
+      res.populate([
+        {
+          path: "inventory",
+          populate: {
+            path: "branch",
+            populate: "business"
+          }
+        },
+        { path: "person" }
+      ]).then(op => {
+        const increament =
+          operation.action === "sale" ? -operation.quantity : operation.quantity;
+        return inventoryController
+          .increamentQuantity(res.inventory._id, increament)
+          .then((inv) => {
+            return op;
+          });
+      })
+    )
   );
 };
 
 const fromId = async (id: string) =>
   Operation.findById(id)
-    .populate("inventory.branch")
-    .populate("employee.user")
+    .populate([
+      { path: "inventory", populate: { path: "branch" } },
+      { path: "user", populate: { path: "user" } }
+    ])
     .then((inv) => inv);
+
 const fromBranch = (branchId: string) => Operation.aggregate([
   {
     $lookup: {
@@ -49,6 +61,17 @@ const fromBranch = (branchId: string) => Operation.aggregate([
   },
   {
     $unwind: '$inventory.branch',
+  },
+  {
+    $lookup: {
+      from: 'businesses', // Replace with the actual name of your Branch collection
+      localField: 'inventory.branch.business',
+      foreignField: '_id',
+      as: 'inventory.branch.business',
+    },
+  },
+  {
+    $unwind: '$inventory.branch.business',
   },
   {
     $lookup: {
@@ -90,22 +113,81 @@ const fromBranch = (branchId: string) => Operation.aggregate([
   },
 ]);
 
-// Operation.find({
-//   "inventory.branch": branchId,
-// })
-//   .populate("inventory.branch")
-//   .populate("employee.user")
-//   .exec()
-//   .then((operations) => [...operations]);
 const fromProduct = async (branchId: string, productName: string) =>
-  Operation.find({
-    "inventory.branch": branchId,
-    "inventory.product.name": productName,
-  })
-    .populate("inventory.branch")
-    .populate("employee.user")
-    .exec()
-    .then((operations) => [...operations]);
+  Operation.aggregate([
+    {
+      $lookup: {
+        from: 'inventories', // Replace with the actual name of your Inventory collection
+        localField: 'inventory',
+        foreignField: '_id',
+        as: 'inventory',
+      },
+    },
+    {
+      $unwind: '$inventory',
+    },
+    {
+      $lookup: {
+        from: 'branches', // Replace with the actual name of your Branch collection
+        localField: 'inventory.branch',
+        foreignField: '_id',
+        as: 'inventory.branch',
+      },
+    },
+    {
+      $unwind: '$inventory.branch',
+    },
+    {
+      $lookup: {
+        from: 'businesses', // Replace with the actual name of your Branch collection
+        localField: 'inventory.branch.business',
+        foreignField: '_id',
+        as: 'inventory.branch.business',
+      },
+    },
+    {
+      $unwind: '$inventory.branch.business',
+    },
+    {
+      $lookup: {
+        from: 'products', // Replace with the actual name of your Branch collection
+        localField: 'inventory.product',
+        foreignField: '_id',
+        as: 'inventory.product',
+      },
+    },
+    {
+      $unwind: '$inventory.product',
+    },
+    {
+      $match: {
+        'inventory.branch._id': new mongoose.Types.ObjectId(branchId),
+        'inventory.product.name': productName,
+      },
+    },
+    {
+      $lookup: {
+        from: 'employees', // Replace with the actual name of your Employee collection
+        localField: 'employee',
+        foreignField: '_id',
+        as: 'employee',
+      },
+    },
+    {
+      $unwind: '$employee',
+    },
+    {
+      $lookup: {
+        from: 'people', // Replace with the actual name of your Person collection
+        localField: 'person',
+        foreignField: '_id',
+        as: 'person',
+      },
+    },
+    {
+      $unwind: '$person',
+    },
+  ]);
 
 const fromPerson = async (field: string, value: string) => {
   const fieldPath = "person." + field;

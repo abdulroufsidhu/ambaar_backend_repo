@@ -35,14 +35,9 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
       }
     })
 
-    Logger.d('authenticator un protected url ', unProtectedUrl)
-
     if (unProtectedUrl) {
       next();
     } else {
-
-      Logger.d('authenticator jobId', !!jobId )
-      Logger.d('authenticator decoded', !!decoded )
 
       if (!jobId || !decoded) {
         throw new Error(`jobIdValidation: ${!!jobId}, tokenValidation: ${!!decoded}`)
@@ -50,11 +45,7 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
 
       const employee = await employeeController.fromId(jobId);
 
-      Logger.d('authenticator employee', employee)
-      
-      const permitted = employee?.permissions?.filter(perm => { Logger.d('authenticator', `${perm.name}==${currentUrl}` ); return perm.name == currentUrl})
-      Logger.d('authenticator permitted', !!permitted)
-      Logger.d('authenticator permitted', permitted)
+      const permitted = employee?.permissions?.filter(perm => { return perm.name == currentUrl })
 
       if (!employee || !permitted || permitted.length < 1) {
         throw new Error(`validEmployee: ${!!employee}, accessPermit: ${!!permitted && permitted.length > 0}`)

@@ -63,11 +63,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         inventory
           ? successResponse({ res, data: inventory })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -78,11 +78,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
           inventory
             ? successResponse({ res, data: inventory })
             : errorResponse({
-                res,
-                code: 404,
-                message: "no data found",
-                data: {},
-              })
+              res,
+              code: 404,
+              message: "no data found",
+              data: {},
+            })
         )
         .catch((error) => res.status(500).json({ error }));
     } else {
@@ -99,11 +99,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
         inventory
           ? successResponse({ res, data: [...inventory] })
           : errorResponse({
-              res,
-              code: 404,
-              message: "no data found",
-              data: {},
-            })
+            res,
+            code: 404,
+            message: "no data found",
+            data: {},
+          })
       )
       .catch((error) => res.status(500).json({ error }));
   }
@@ -118,7 +118,8 @@ const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IInventory = req.body;
   return productController
     .update(req.body.product._id, body.product)
-    .then((inventory) => successResponse({ res, data: inventory }))
+    .then((product) => update(req.body._id, body).then((inventory) => successResponse({ res, data: inventory })
+    ))
     .catch((error) => errorResponse({ res, data: error }));
 };
 
