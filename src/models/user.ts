@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IPerson } from "./person";
 import uniqueValidator from "mongoose-unique-validator";
-import { string } from "joi";
 
 export interface IUser {
   person: IPerson;
@@ -9,7 +8,7 @@ export interface IUser {
   token?: string;
 }
 
-interface IUserModel extends IUser, Document {}
+interface IUserModel extends IUser, Document { }
 
 const UserSchema: Schema = new Schema(
   {
