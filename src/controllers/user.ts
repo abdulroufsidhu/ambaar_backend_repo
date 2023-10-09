@@ -35,10 +35,10 @@ const fromEmail = async (email: string, password: string) =>
     !!!p
       ? undefined
       : User.findOne({ person: p._id, password: password })
-          .populate("person")
+        .populate("person")
 
-          .exec()
-          .then((user) => user)
+        .exec()
+        .then((user) => user)
   );
 
 const fromId = async (id: string) => User.findById(id).then((user) => user);
@@ -137,6 +137,33 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+const changePassword = async (
+  req: Request, res: Response, next: NextFunction
+) => {
+  try {
+    const user = req.body.employee.user
+    const oldPassword: string = req.query.old_password?.toString() ?? "";
+    const newPassword: string = req.query.new_password?.toString() ?? "";
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if the old password matches the current password
+    const isPasswordMatch = await user.comparePassword(oldPassword);
+    if (!isPasswordMatch) {
+      throw new Error("Old password is incorrect");
+    }
+
+    // Update the password
+    user.password = newPassword;
+    await user.save();
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export default {
   create,
   update,
@@ -149,4 +176,5 @@ export default {
   readReq,
   updateReq,
   removeReq,
+  changePassword,
 };

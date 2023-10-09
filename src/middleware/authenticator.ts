@@ -39,7 +39,7 @@ export const authenticator = async (req: Request, res: Response, next: NextFunct
       next();
     } else {
 
-      if (!jobId || !decoded) {
+      if (!jobId || !decoded || !decoded) {
         throw new Error(`jobIdValidation: ${!!jobId}, tokenValidation: ${!!decoded}`)
       }
 
