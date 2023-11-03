@@ -11,7 +11,6 @@ const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUp
 
 const fromId = async (id: string) =>
   Employee.findById(id)
-    .populate("permissions")
     .populate([
       {
         path: "user",

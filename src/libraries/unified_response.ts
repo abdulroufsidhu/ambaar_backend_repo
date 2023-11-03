@@ -7,9 +7,9 @@ interface UnifiedResponseProps<T extends any> {
   data?: T;
 }
 export const successResponse = <T extends any>({
-  res, code = 200, message = "", data
+  res, code = 200, message = "Success", data
 }: UnifiedResponseProps<T>) => res.status(code).json({ status: code, message, data })
 
-export const errorResponse = <T extends object>({
+export const errorResponse = <T extends object | unknown>({
   res, code = 500, message = "Error", data = <T>{}
 }: UnifiedResponseProps<T>) => res.status(code).json({ status: code, message, data })

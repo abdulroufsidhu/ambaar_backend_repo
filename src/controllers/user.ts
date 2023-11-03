@@ -5,6 +5,7 @@ import { Logger } from "../libraries/logger";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { config } from "../config/config";
 import jwt from "jsonwebtoken";
+import UserModel from "../models/user";
 
 const create = async (user: IUser) => {
   if (!!!user.person) return;
@@ -34,11 +35,12 @@ const fromEmail = async (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
       ? undefined
-      : User.findOne({ person: p._id, password: password })
-        .populate("person")
-
-        .exec()
-        .then((user) => user)
+      : User.findOne({ person: p._id})
+        .select("+password")
+        .then(user => 
+          user?.comparePassword(password)
+          .then(match => match ? user.populate("person").then(user=>user) : null)
+        )
   );
 
 const fromId = async (id: string) => User.findById(id).then((user) => user);
@@ -141,26 +143,25 @@ const changePassword = async (
   req: Request, res: Response, next: NextFunction
 ) => {
   try {
-    const user = req.body.employee.user
-    const oldPassword: string = req.query.old_password?.toString() ?? "";
-    const newPassword: string = req.query.new_password?.toString() ?? "";
+    const user = await User.findOne({ _id: req.body.user._id }).select('+password')
+    const oldPassword: string = req.body.old_password?.toString() ?? "";
+    const newPassword: string = req.body.new_password?.toString() ?? "";
     if (!user) {
       throw new Error("User not found");
     }
 
     // Check if the old password matches the current password
-    const isPasswordMatch = await user.comparePassword(oldPassword);
+    const userModel = new UserModel(user);
+    const isPasswordMatch =  await userModel.comparePassword(oldPassword);
     if (!isPasswordMatch) {
       throw new Error("Old password is incorrect");
     }
 
     // Update the password
     user.password = newPassword;
-    await user.save();
-
-    return user;
+    return user.save().then(user => successResponse({res, data: user}))
   } catch (error) {
-    throw error;
+    return errorResponse({res, data: error})
   }
 };
 

@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { Branch, IBranch, IPermission } from "../models";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { employeeController } from ".";
+import { Logger } from "../libraries/logger";
 
 const create = async (userId: string, branch: IBranch, permissions?: IPermission[]) => {
   const b = new Branch({ ...branch });
+  Logger.i('branch permissions count', permissions?.length)
   return b.save().then((branch) =>
     employeeController
       .create({

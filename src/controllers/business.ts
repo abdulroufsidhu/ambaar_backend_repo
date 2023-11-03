@@ -2,12 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import { Business, IBusiness } from "../models";
 import { branchController, permissionController } from ".";
 import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Logger } from "../libraries/logger";
 
 const create = (business: IBusiness, location: string, userId: string) => {
   const b = new Business({ ...business });
   return b.save().then((business) =>
-    permissionController.readAll().then((perms) =>
-      branchController
+    permissionController.readAll().then((perms) => {
+      Logger.i("business permissions count", perms.length);
+      return branchController
         .create(
           userId,
           {
@@ -19,8 +21,8 @@ const create = (business: IBusiness, location: string, userId: string) => {
           },
           perms
         )
-        .then((res) => res)
-    )
+        .then((res) => res);
+    })
   );
 };
 
@@ -70,7 +72,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((business) =>
         business
           ? successResponse({ res, data: business })
-          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Business Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -79,7 +86,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((business) =>
         business
           ? successResponse({ res, data: business })
-          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Business Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -88,7 +100,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((business) =>
         business
           ? successResponse({ res, data: business })
-          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Business Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -97,7 +114,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((business) =>
         business
           ? successResponse({ res, data: business })
-          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Business Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -106,7 +128,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((business) =>
         business
           ? successResponse({ res, data: business })
-          : errorResponse({ res, code: 404, message: "Business Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Business Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -119,8 +146,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
   //   )
   //   .catch((error) => errorResponse({ res, data: error }));
 
-  return errorResponse({ res, message: "Please make sure to provide id, contact, licence or email query parameter", data: {} })
-
+  return errorResponse({
+    res,
+    message:
+      "Please make sure to provide id, contact, licence or email query parameter",
+    data: {},
+  });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBusiness = req.body;

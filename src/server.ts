@@ -16,17 +16,45 @@ import {
   inventoryRoutes,
   operationRoutes,
 } from "./routes";
-import { authenticator } from "./middleware/authenticator";
+import Routes from "./routes/routes";
+import { Permission } from "./models";
 
 const server = express();
 
 server.use(cors());
+
+const createPermissions = async () => {
+  const permissionPromises = [];
+
+  for (const base in Routes) {
+    if (Routes.hasOwnProperty(base)) {
+
+      for (const url in Routes[base]) {
+        const permissionName = `${Routes[base].base}${Routes[base][url]}`;
+        // Create a new Permission document
+        const newPermission = new Permission({ name: permissionName });
+        // Save the document to the database
+        try {
+          const permissionPromise = newPermission.save();
+          permissionPromises.push(permissionPromise);
+        } catch (error) {}
+      }
+    }
+  }
+
+  // Wait for all permission documents to be saved
+  try {
+    await Promise.all(permissionPromises);
+    console.log('Permission documents created for route patterns.');
+  } catch (error) {Logger.w('server', error)}
+}
 
 const connectToDB = () => {
   mongoose
     .connect(config.DB.url)
     .then(() => {
       Logger.d("server", "connedted to database");
+      createPermissions();
       startServer();
     })
     .catch((error) => {
@@ -77,15 +105,15 @@ function startServer() {
 
   // TODO implement jwt (json web token) and then authenticate actions with permission
   // Routes
-  server.use(routes.person, personRoutes);
-  server.use(routes.users, userRoutes);
-  server.use(routes.businesses, authenticator, businessRoutes);
-  server.use(routes.branches, authenticator, branchRoutes);
-  server.use(routes.employees, employeeRoutes);
-  server.use(routes.permissions, authenticator, permissionRoutes);
-  server.use(routes.products, authenticator, productRoutes);
-  server.use(routes.inventory, authenticator, inventoryRoutes);
-  server.use(routes.operation, authenticator, operationRoutes);
+  server.use(routes.person.base, personRoutes);
+  server.use(routes.user.base, userRoutes);
+  server.use(routes.businesses.base, businessRoutes);
+  server.use(routes.branches.base,  branchRoutes);
+  server.use(routes.employees.base, employeeRoutes);
+  server.use(routes.permissions.base, permissionRoutes);
+  server.use(routes.products.base, productRoutes);
+  server.use(routes.inventory.base, inventoryRoutes);
+  server.use(routes.operation.base, operationRoutes);
 
   // Health Check
   server.get("/ping", (req, res) => res.status(200).json({ message: "pong" }));

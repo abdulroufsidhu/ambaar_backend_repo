@@ -1,7 +1,8 @@
-import mongoose, { CallbackError, Document, Schema } from "mongoose";
+import mongoose, { CallbackError, Document, Model, Schema } from "mongoose";
 import { IPerson } from "./person";
 import uniqueValidator from "mongoose-unique-validator";
 import bcrypt from 'bcrypt';
+import { Logger } from "../libraries/logger";
 
 export interface IUser {
   person: IPerson;
@@ -9,7 +10,7 @@ export interface IUser {
   token?: string;
 }
 
-interface IUserModel extends IUser, Document { }
+interface IUserModel extends IUser, Document { comparePassword(candidatePassword: string): Promise<boolean>; }
 
 const UserSchema: Schema = new Schema(
   {
@@ -25,7 +26,6 @@ const UserSchema: Schema = new Schema(
   },
   { versionKey: false, timestamps: true }
 );
-UserSchema.plugin(uniqueValidator);
 
 // Middleware to hash the password before saving
 UserSchema.pre<IUserModel>("save", async function (next) {
@@ -53,8 +53,13 @@ UserSchema.pre<IUserModel>("save", async function (next) {
 
 // Add a method to compare passwords
 UserSchema.methods.comparePassword = async function (candidatePassword: string) {
-  const user = this as IUserModel;
-  return bcrypt.compare(candidatePassword, user.password);
+  const hashedPassword = this.password; // Get the hashed password from the user document
+  const matched = await bcrypt.compare(candidatePassword, hashedPassword);
+  Logger.i('user comparePassword -- matched ', matched);
+  return matched;
 };
 
+UserSchema.plugin(uniqueValidator);
+
 export default mongoose.model<IUserModel>("User", UserSchema);
+

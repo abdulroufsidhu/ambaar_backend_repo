@@ -1,11 +1,31 @@
 import express from "express";
 import { employeeController as controller } from "../controllers";
+import { Authenticator } from "../middleware/authenticator";
+import Routes from "./routes";
 
 const router = express.Router();
 
-router.post("/create", controller.createReq);
-router.get("/get", controller.readReq); // /get?id="testId"
-router.patch("/update", controller.updateReq);
-router.delete("/remove", controller.removeReq); // /remove?id="testId"
+router.post(
+  Routes.employees.create,
+  Authenticator.requireUser,
+  Authenticator.requireEmployeement,
+  Authenticator.requirePermission,
+  controller.createReq
+);
+router.get(Routes.employees.get, controller.readReq); // /get?id="testId"
+router.patch(
+  Routes.employees.update,
+  Authenticator.requireUser,
+  Authenticator.requireEmployeement,
+  Authenticator.requirePermission,
+  controller.updateReq
+);
+router.delete(
+  Routes.employees.remove,
+  Authenticator.requireUser,
+  Authenticator.requireEmployeement,
+  Authenticator.requirePermission,
+  controller.removeReq
+); // /remove?id="testId"
 
 export = router;
