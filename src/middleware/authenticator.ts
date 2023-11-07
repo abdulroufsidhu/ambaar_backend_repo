@@ -30,7 +30,7 @@ export const Authenticator = {
       req.body.self = decoded; // Attach the decoded user to the request object
       next();
     } catch (error) {
-      Logger.d('authenticator', error);
+      Logger.d("authenticator", error);
       return errorResponse({
         res,
         code: 401,
@@ -42,9 +42,7 @@ export const Authenticator = {
   requireEmployeement: (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.body.self) {
-        throw new Error(
-          `user not found`
-        )
+        throw new Error(`user not found`);
       }
       const jobId = req.header("job");
       if (!jobId) {
@@ -52,7 +50,7 @@ export const Authenticator = {
           `jobIdValidation: ${!!jobId}, tokenValidation: ${!!req.body.user}`
         );
       }
-  
+
       employeeController
         .fromId(jobId)
         .then((e) => {
@@ -61,18 +59,20 @@ export const Authenticator = {
         })
         .catch((e) => errorResponse({ res, data: e }));
     } catch (error) {
-      Logger.d('authenticator', error);
-      errorResponse({res, data: error})
+      Logger.d("authenticator", error);
+      errorResponse({ res, data: error });
     }
   },
   requirePermission: (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.body.employee) {
-        throw new Error(
-          `employee not found`
-        )
+        throw new Error(`employee not found`);
       }
-      const currentUrl = req.originalUrl.split("?")[0];
+      if(req.body.self._id == req.body.employee.user._id) {
+        next()
+        return
+      }
+      const currentUrl = req.originalUrl.split("?")[0].replace(/\/$/, '');
       Logger.i("authenticator currentUrl: ", currentUrl);
       const permitted = (req.body.employee as IEmployee)?.permissions?.filter(
         (perm) => {
@@ -88,8 +88,8 @@ export const Authenticator = {
       }
       next();
     } catch (error) {
-      Logger.d('authenticator', error);
-      errorResponse({res, data: error})
+      Logger.d("authenticator", error);
+      errorResponse({ res, data: error });
     }
   },
 };

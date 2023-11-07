@@ -4,9 +4,13 @@ import { errorResponse, successResponse } from "../libraries/unified_response";
 import { employeeController } from ".";
 import { Logger } from "../libraries/logger";
 
-const create = async (userId: string, branch: IBranch, permissions?: IPermission[]) => {
+const create = async (
+  userId: string,
+  branch: IBranch,
+  permissions?: IPermission[]
+) => {
   const b = new Branch({ ...branch });
-  Logger.i('branch permissions count', permissions?.length)
+  Logger.i("branch permissions count", permissions?.length);
   return b.save().then((branch) =>
     employeeController
       .create({
@@ -14,13 +18,15 @@ const create = async (userId: string, branch: IBranch, permissions?: IPermission
         role: "founder",
         user: userId as any,
         permissions: permissions ?? [],
-        status: 'active',
+        status: "active",
       })
       .then((employee) =>
-        employee.populate({
-          path: "branch",
-          populate: { path: "business", model: "Business" },
-        })
+        employee.populate([
+          {
+            path: "branch",
+            populate: { path: "business", model: "Business" },
+          },
+        ])
       )
   );
 };
@@ -47,7 +53,7 @@ const remove = async (id: string) =>
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IBranch = req.body;
   const userId: string = req.body.employee.user._id;
-  const permissions: IPermission[] = req.body.permissions
+  const permissions: IPermission[] = req.body.permissions;
   return create(userId, body, permissions)
     .then((branch) => successResponse({ res, data: branch }))
     .catch((error) => errorResponse({ res, data: error }));
@@ -64,7 +70,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((branch) =>
         branch
           ? successResponse({ res, data: branch })
-          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Branch Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -73,7 +84,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((branch) =>
         branch
           ? res.status(200).json([...branch])
-          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Branch Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -82,7 +98,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((branch) =>
         branch
           ? successResponse({ res, data: branch })
-          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Branch Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -91,7 +112,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((branch) =>
         branch
           ? successResponse({ res, data: branch })
-          : errorResponse({ res, code: 404, message: "Branch Not Found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "Branch Not Found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }

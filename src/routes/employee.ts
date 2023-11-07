@@ -12,7 +12,13 @@ router.post(
   Authenticator.requirePermission,
   controller.createReq
 );
-router.get(Routes.employees.get, controller.readReq); // /get?id="testId"
+router.get(
+  Routes.employees.get,
+  Authenticator.requireUser,
+  Authenticator.requireEmployeement,
+  Authenticator.requirePermission,
+  controller.readReq
+); // /get?id="testId"
 router.patch(
   Routes.employees.update,
   Authenticator.requireUser,

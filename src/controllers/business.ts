@@ -19,7 +19,7 @@ const create = (business: IBusiness, location: string, userId: string) => {
             email: business.email,
             location: location,
           },
-          perms
+          perms.map(i=>i._id)
         )
         .then((res) => res);
     })

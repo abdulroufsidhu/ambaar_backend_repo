@@ -7,11 +7,16 @@ const create = async (employee: IEmployee) => {
   return e.save().then((employee) => employee);
 };
 
-const update = async (id: string, employee: IEmployee) => Employee.findByIdAndUpdate(id, employee)
+const update = async (id: string, employee: IEmployee) =>
+  Employee.findByIdAndUpdate(id, employee);
 
 const fromId = async (id: string) =>
   Employee.findById(id)
     .populate([
+      {
+        path: "permissions",
+        model: "Permission",
+      },
       {
         path: "user",
         select: "-password -token",
@@ -30,9 +35,12 @@ const fromId = async (id: string) =>
     ])
     .then((e) => e);
 const fromUserId = async (id: string) =>
-  Employee.find({ user: id, status: 'active' })
-  .populate("permissions")
+  Employee.find({ user: id, status: "active" })
     .populate([
+      {
+        path: "permissions",
+        model: "Permission",
+      },
       {
         path: "user",
         select: "-password -token",
@@ -52,8 +60,11 @@ const fromUserId = async (id: string) =>
     .then((e) => e);
 const fromBranchId = async (id: string) =>
   Employee.find({ branch: id, status: "active" })
-    .populate("permissions")
     .populate([
+      {
+        path: "permissions",
+        model: "Permission"
+      },
       {
         path: "user",
         select: "-password -token",
@@ -73,7 +84,7 @@ const fromBranchId = async (id: string) =>
     .then((e) => e);
 
 const remove = async (id: string) =>
-  Employee.findByIdAndUpdate(id, { status: 'inactive' }).then((e) => e);
+  Employee.findByIdAndUpdate(id, { status: "inactive" }).then((e) => e);
 
 const createReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
@@ -91,7 +102,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((employee) =>
         employee
           ? successResponse({ res, data: employee })
-          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "employee not found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -100,7 +116,12 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((employee) =>
         employee
           ? successResponse({ res, data: [...employee] })
-          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "employee not found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
@@ -109,11 +130,20 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
       .then((employee) =>
         employee
           ? successResponse({ res, data: [...employee] })
-          : errorResponse({ res, code: 404, message: "employee not found", data: {} })
+          : errorResponse({
+              res,
+              code: 404,
+              message: "employee not found",
+              data: {},
+            })
       )
       .catch((error) => errorResponse({ res, data: error }));
   }
-  return errorResponse({ res, message: "Please make sure to provide id, uid or branch_id query parameter", data: {} })
+  return errorResponse({
+    res,
+    message: "Please make sure to provide id, uid or branch_id query parameter",
+    data: {},
+  });
 };
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;

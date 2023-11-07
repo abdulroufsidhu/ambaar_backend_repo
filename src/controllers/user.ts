@@ -23,9 +23,6 @@ const create = async (user: IUser) => {
   );
 };
 
-const update = async (id: string, user: IUser) =>
-  User.findByIdAndUpdate(id, user);
-
 const fromPerson = async (person_id: string) =>
   User.findOne({ person: person_id }).then((user) => {
     if (!!user) return user;
@@ -35,12 +32,15 @@ const fromEmail = async (email: string, password: string) =>
   personController.fromEmail(email).then((p) =>
     !!!p
       ? undefined
-      : User.findOne({ person: p._id})
-        .select("+password")
-        .then(user => 
-          user?.comparePassword(password)
-          .then(match => match ? user.populate("person").then(user=>user) : null)
-        )
+      : User.findOne({ person: p._id })
+          .select("+password")
+          .then((user) =>
+            user
+              ?.comparePassword(password)
+              .then((match) =>
+                match ? user.populate("person").then((user) => user) : null
+              )
+          )
   );
 
 const fromId = async (id: string) => User.findById(id).then((user) => user);
@@ -59,9 +59,18 @@ const createReq = async (req: Request, res: Response, next: NextFunction) => {
   Logger.w("User", req.body);
   return (
     create(body)
-      ?.then((user) => successResponse({ res, data: user }))
-      ?.catch((error) => errorResponse({ res, data: error })) ??
-    res.status(500).json({ error: "User not created" })
+      ?.then((user) => {
+        if (!user) {
+          errorResponse({res, message: "User created successfully"})
+        }
+        const token = jwt.sign(
+          { _id: user!._id, person: user!.person },
+          config.JWT.key
+        ); // Replace 'your-secret-key' with your actual secret key
+        user!.token = token; // Update the user with the token (you might save this in a database in real scenarios)
+        return user?.save().then(v=>successResponse({res, data: v})).catch(e=>errorResponse({res, data: e}))
+      })
+      ?.catch((error) => errorResponse({ res, data: error })) ?? errorResponse({res, code: 500, message: "User not created"})
   );
 };
 
@@ -98,7 +107,7 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
           config.JWT.key
         ); // Replace 'your-secret-key' with your actual secret key
         user.token = token; // Update the user with the token (you might save this in a database in real scenarios)
-        return update(user._id, user).then(() =>
+        return user.save().then(() =>
           successResponse({ res, data: user })
         );
       } else {
@@ -140,10 +149,14 @@ const removeReq = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const changePassword = async (
-  req: Request, res: Response, next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const user = await User.findOne({ _id: req.body.user._id }).select('+password')
+    const user = await User.findOne({ _id: req.body.user._id }).select(
+      "+password"
+    );
     const oldPassword: string = req.body.old_password?.toString() ?? "";
     const newPassword: string = req.body.new_password?.toString() ?? "";
     if (!user) {
@@ -152,22 +165,21 @@ const changePassword = async (
 
     // Check if the old password matches the current password
     const userModel = new UserModel(user);
-    const isPasswordMatch =  await userModel.comparePassword(oldPassword);
+    const isPasswordMatch = await userModel.comparePassword(oldPassword);
     if (!isPasswordMatch) {
       throw new Error("Old password is incorrect");
     }
 
     // Update the password
     user.password = newPassword;
-    return user.save().then(user => successResponse({res, data: user}))
+    return user.save().then((user) => successResponse({ res, data: user }));
   } catch (error) {
-    return errorResponse({res, data: error})
+    return errorResponse({ res, data: error });
   }
 };
 
 export default {
   create,
-  update,
   fromPerson,
   fromEmail,
   fromId,
