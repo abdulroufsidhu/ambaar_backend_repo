@@ -63,7 +63,7 @@ const fromBranchId = async (id: string) =>
     .populate([
       {
         path: "permissions",
-        model: "Permission"
+        model: "Permission",
       },
       {
         path: "user",
@@ -148,6 +148,11 @@ const readReq = async (req: Request, res: Response, next: NextFunction) => {
 const updateReq = async (req: Request, res: Response, next: NextFunction) => {
   const body: IEmployee = req.body;
   return Employee.findByIdAndUpdate(req.body._id, body)
+    .populate([
+      { path: "user", populate: { path: "person" } },
+      { path: "branch", populate: { path: "business" } },
+      { path: "permissions" },
+    ])
     .then((employee) => successResponse({ res, data: employee }))
     .catch((error) => errorResponse({ res, data: error }));
 };

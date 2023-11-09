@@ -30,14 +30,17 @@ const createPermissions = async () => {
     if (Routes.hasOwnProperty(base)) {
 
       for (const url in Routes[base]) {
-        const permissionName = `${Routes[base].base}${Routes[base][url]}`;
-        // Create a new Permission document
-        const newPermission = new Permission({ name: permissionName });
-        // Save the document to the database
-        try {
-          const permissionPromise = newPermission.save();
-          permissionPromises.push(permissionPromise);
-        } catch (error) {}
+        if (Routes[base].base != Routes[base][url]) {
+          // Create a new Permission document
+          const permissionName = `${Routes[base].base}${Routes[base][url]}`;
+          
+          // Save the document to the database
+          const newPermission = new Permission({ name: permissionName });
+          try {
+            const permissionPromise = newPermission.save();
+            permissionPromises.push(permissionPromise);
+          } catch (error) {}
+        }
       }
     }
   }

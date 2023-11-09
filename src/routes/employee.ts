@@ -12,6 +12,14 @@ router.post(
   Authenticator.requirePermission,
   controller.createReq
 );
+
+router.get(
+  Routes.employees.base,
+  Authenticator.requireUser,
+  Authenticator.requireSelf,
+  controller.readReq
+)
+
 router.get(
   Routes.employees.get,
   Authenticator.requireUser,

@@ -39,6 +39,25 @@ export const Authenticator = {
       });
     }
   },
+  requireSelf: (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.body.self) {
+        throw new Error(`User not found`);
+      }
+
+      // Check if the user is accessing their own data
+      const resourceId = !!req.params.uid ? req.params.uid : req.query.uid ; // Assuming you're working with a resource ID in the URL
+
+      if (req.body.self._id == resourceId) {
+        next(); // User is accessing their own data, continue to the next middleware
+      } else {
+        throw new Error(`Access to other user's data is not allowed`);
+      }
+    } catch (error) {
+      Logger.d("authenticator", error);
+      errorResponse({ res, data: error });
+    }
+  },
   requireEmployeement: (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.body.self) {
