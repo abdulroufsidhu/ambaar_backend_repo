@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
+import mongoose, { Error } from "mongoose";
 import http from "http";
 import { config } from "./config/config";
 import { Logger } from "./libraries/logger";
@@ -49,7 +49,9 @@ const createPermissions = async () => {
   try {
     await Promise.all(permissionPromises);
     console.log('Permission documents created for route patterns.');
-  } catch (error) {Logger.w('server', error)}
+  } catch (error) {
+    Logger.w('server', (error as Error).message)
+  }
 }
 
 const connectToDB = () => {
