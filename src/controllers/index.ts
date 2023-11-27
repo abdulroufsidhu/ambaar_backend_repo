@@ -1,12 +1,12 @@
-import branchController from "./branch";
-import businessController from "./business";
-import employeeController from "./employee";
-import permissionController from "./permission";
-import personController from "./person";
-import userController from "./user";
-import productController from "./product";
-import inventoryController from "./inventory";
-import operationController from "./operation"
+import branchController from "./branch_controller";
+import businessController from "./business_controller";
+import employeeController from "./employee_controller";
+import permissionController from "./permission_controller";
+import personController from "./person_controller";
+import userController from "./user_controller";
+import productController from "./product_controller";
+import inventoryController from "./inventory_controller";
+import operationController from "./operation_controller"
 
 export {
   branchController,
