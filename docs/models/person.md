@@ -1,92 +1,80 @@
-# Mongoose Person Model Documentation
-## Overview
+# Developer Documentation: Person Model
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+4. [Model Overview](#model-overview)
+5. [Usage](#usage)
+    - [Creating a New Person](#creating-a-new-person)
+6. [Schema Details](#schema-details)
+    - [Fields](#fields)
+    - [Validation](#validation)
+9. [Contributing](#contributing)
+10. [License](#license)
+## Introduction
+This document provides developer documentation for the Person model, a MongoDB schema created with Mongoose. The model represents individual persons and includes features such as unique validation for various fields.
 
-The provided code defines a Mongoose model for a person, using the MongoDB database. It uses the Mongoose library along with the mongoose-unique-validator plugin for handling unique constraints.
-Installation
-
-Before using the code, ensure that you have Node.js and npm installed. Additionally, install the required npm packages by running:
+## Prerequisites
+- Node.js and npm installed
+- MongoDB installed and running
+- Understanding of TypeScript and Mongoose
+## Installation
+1. Install the required dependencies:
 
 ```bash
 npm install mongoose mongoose-unique-validator
 ```
-### Code Explanation
+2. Import the necessary modules in your code:
 
-### Importing Dependencies:
-  mongoose: The MongoDB object modeling tool for Node.js.
-  Document and Schema from mongoose.
-  mongooseUniqueValidator: A plugin for Mongoose that adds pre-save validation for unique fields.
-
-```javascript
-import mongoose, { Document, Schema } from "mongoose";
-import mongooseUniqueValidator from "mongoose-unique-validator";
+```typescript
+import mongoose from 'mongoose';
+import Person, { IPersonModel } from './path-to-person-model';
 ```
-### Defining IPerson Interface:
-  IPerson: An interface defining the structure of a person, including name, username, contact, national ID, and email.
+3. Connect to your MongoDB database:
 
-```javascript
-export interface IPerson {
-  name: string;
-  username?: string;
-  contact: string;
-  nationalId?: string;
-  email?: string;
-}
+```typescript
+mongoose.connect('mongodb://localhost:27017/your-database', { useNewUrlParser: true, useUnifiedTopology: true });
 ```
+## Model Overview
+The Person model represents individual persons and includes fields such as name, username, contact, national ID, and email. It also ensures the uniqueness of certain fields using the mongoose-unique-validator plugin.
 
-### Defining IPersonModel Interface:
-  IPersonModel: An interface extending IPerson and Document, representing a Mongoose document.
-
-```javascript
-interface IPersonModel extends IPerson, Document {}
-```
-### Creating Person Schema:
-  - **PersonSchema:** A Mongoose schema defining the structure of the person document.
-    - **Fields:** `name`, `username`, `contact`, `nationalId`, and `email`.
-    - **Additional options:** `versionKey: false` (disabling the version key) and `timestamps: true` (adding createdAt and updatedAt fields).
-
-```javascript
-const PersonSchema: Schema = new Schema(
-  {
-    name: { type: String, required: true },
-    username: { type: String, trim: true, unique: true },
-    contact: { type: String, required: true, trim: true, unique: true },
-    nationalId: { type: String, trim: true, unique: true },
-    email: { type: String, unique: true, trim: true, index: true },
-  },
-  { versionKey: false, timestamps: true }
-);
-```
-### Adding Unique Validation Plugin:
-  - **PersonSchema.plugin(mongooseUniqueValidator):** Adding the mongoose-unique-validator plugin to the schema to enforce unique constraints.
-
-```javascript
-PersonSchema.plugin(mongooseUniqueValidator);
-```
-### Exporting Mongoose Model:
-  - **export default mongoose.model<IPersonModel>("Person", PersonSchema):** Exporting the Mongoose model for the person, specifying the model name as "**Person**" and using the defined schema.
-
-## Usage Example
-
-```javascript
-// Import the Person model
-import PersonModel, { IPerson } from "./path/to/person.model";
-
-// Create a new person document
-const newPerson: IPerson = {
-  name: "John Doe",
-  username: "john_doe",
-  contact: "+123456789",
-  nationalId: "123456789",
-  email: "john.doe@example.com",
+## Usage
+### Creating a New Person
+```typescript
+const samplePerson: IPersonModel = {
+  name: 'John Doe',
+  username: 'john_doe',
+  contact: '1234567890',
+  nationalId: 'ABC123456',
+  email: 'john.doe@example.com',
 };
 
-// Save the new person document to the database
-PersonModel.create(newPerson)
-  .then((createdPerson) => {
-    console.log("Person created:", createdPerson);
+const newPerson = new Person(samplePerson);
+
+newPerson.save()
+  .then((savedPerson) => {
+    console.log('Person saved:', savedPerson);
   })
   .catch((error) => {
-    console.error("Error creating person:", error.message);
+    console.error('Error saving person:', error);
   });
 ```
-This example demonstrates creating a new person document and saving it to the MongoDB database using the Mongoose model. Note that error handling is included for potential validation errors, such as `duplicate unique fields`.
+## Schema Details
+### Fields
+- **`name`**: Name of the person (required).
+- **`username`**: Unique username for the person.
+- **`contact`**: Contact number of the person (required).
+- **`nationalId`**: National ID of the person.
+- **`email`**: Email address of the person.
+### Validation
+- **`name`**: Required.
+- **`username`**: Should be unique.
+- **`contact`**: Required and should be unique.
+- **`nationalId`**: Should be unique.
+- **`email`**: Should be unique.
+## Contributing
+Contributions are welcome! Feel free to open issues, submit pull requests, or provide feedback.
+
+## License
+This project is licensed under the MIT License.
+
