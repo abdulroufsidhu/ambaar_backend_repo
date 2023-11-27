@@ -7,5 +7,5 @@
 - run `npm i && npm start`
 
 ### Project Architecture
-> Your commitment to continuous improvement in architecture and [documentation](./src/shared/models/readme.md) is commendable. Let's work together to refine and enhance the system.
+> Your commitment to continuous improvement in architecture and [documentation](./docs/models/readme.md) is commendable. Let's work together to refine and enhance the system.
 
