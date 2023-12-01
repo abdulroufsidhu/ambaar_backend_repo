@@ -2,6 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { Person, IPerson } from "../models";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 
+import { PrismaClient } from "@prisma/client";
+
+class PrismaPersonController {
+  prisma = new PrismaClient()
+  create = async (person: IPerson) => this.prisma.person.create
+}
+
 class PersonController {
   create = async (person: IPerson) => {
     const p = new Person({
