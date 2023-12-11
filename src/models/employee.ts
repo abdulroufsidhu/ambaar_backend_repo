@@ -19,7 +19,7 @@ const EmployeeSchema: Schema = new Schema(
     branch: { type: mongoose.Types.ObjectId, required: true, ref: "Branch" },
     role: { type: String, required: true },
     permissions: {
-      type: Array<mongoose.Types.ObjectId>,
+      type: [mongoose.Types.ObjectId],
       ref: "Permission",
     },
     status: { type: String, required: true, enum: ["active", "inactive"] }
