@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "loiane.ts-extension-pack",
+        "dbaeumer.vscode-eslint",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "esbenp.prettier-vscode",
+        "Gruntfuggly.todo-tree",
+        "GitHub.copilot",
+    ]
+}
