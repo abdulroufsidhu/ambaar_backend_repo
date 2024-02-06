@@ -7,5 +7,6 @@
         "esbenp.prettier-vscode",
         "Gruntfuggly.todo-tree",
         "GitHub.copilot",
+        "Durzn.brackethighlighter",
     ]
 }
