@@ -1,6 +1,6 @@
 import express from "express";
-import { userController as controller } from "../controllers";
-import { Authenticator } from "../middleware/authenticator";
+import { userController as controller } from "../../controllers/mongo";
+import { Authenticator } from "../../middleware/authenticator";
 import Routes from "./routes";
 
 const router = express.Router();

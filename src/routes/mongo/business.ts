@@ -1,41 +1,27 @@
 import express from "express";
-import { employeeController as controller } from "../controllers";
-import { Authenticator } from "../middleware/authenticator";
+import { businessController as controller } from "../../controllers/mongo";
+import { Authenticator } from "../../middleware/authenticator";
 import Routes from "./routes";
 
 const router = express.Router();
 
-router.post(
-  Routes.employees.create,
-  Authenticator.requireUser,
-  Authenticator.requireEmployeement,
-  Authenticator.requirePermission,
-  controller.createReq
-);
-
+router.post(Routes.businesses.create, Authenticator.requireUser, controller.createReq);
 router.get(
-  Routes.employees.base,
-  Authenticator.requireUser,
-  Authenticator.requireSelf,
-  controller.readReq
-)
-
-router.get(
-  Routes.employees.get,
+  Routes.businesses.get,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.readReq
 ); // /get?id="testId"
 router.patch(
-  Routes.employees.update,
+  Routes.businesses.update,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.updateReq
 );
 router.delete(
-  Routes.employees.remove,
+  Routes.businesses.remove,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,

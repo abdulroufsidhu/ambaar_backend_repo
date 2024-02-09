@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Employee, IEmployee } from "../models";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Employee, IEmployee } from "../../models/mongo";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 
 class EmployeeController {
   create = async (employee: IEmployee) => {

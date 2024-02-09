@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Permission, IPermission } from "../models";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Permission, IPermission } from "../../models/mongo";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 
 class PermissionController {
   create = async (permission: IPermission) => {

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { Branch, IBranch, IPermission } from "../models";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Branch, IBranch, IPermission } from "../../models/mongo";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 import { employeeController } from ".";
-import { Logger } from "../libraries/logger";
+import { Logger } from "../../libraries/logger";
 
 class BranchController {
   create = async (

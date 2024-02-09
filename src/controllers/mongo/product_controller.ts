@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Product, IProduct } from "../models";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Product, IProduct } from "../../models/mongo";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 
 class ProductController {
   create = async (product: IProduct) => {

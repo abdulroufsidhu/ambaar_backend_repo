@@ -1,37 +1,30 @@
 import express from "express";
-import { branchController as controller } from "../controllers";
+import { inventoryController as controller } from "../../controllers/mongo";
+import { Authenticator } from "../../middleware/authenticator";
 import Routes from "./routes";
-import { Authenticator } from "../middleware/authenticator";
 
 const router = express.Router();
 
 router.post(
-  Routes.branches.create,
+  Routes.inventory.create,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.createReq
 );
 router.get(
-  Routes.branches.get,
+  Routes.inventory.get,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.readReq
 ); // /get?id="testId"
 router.patch(
-  Routes.branches.update,
+  Routes.inventory.update,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.updateReq
 );
-router.delete(
-  Routes.branches.remove,
-  Authenticator.requireUser,
-  Authenticator.requireEmployeement,
-  Authenticator.requirePermission,
-  controller.removeReq
-); // /remove?id="testId"
 
 export = router;

@@ -1,26 +1,24 @@
 import express from "express";
-import { inventoryController as controller } from "../controllers";
-import { Authenticator } from "../middleware/authenticator";
+import { operationController as controller } from "../../controllers/mongo";
+import { Authenticator } from "../../middleware/authenticator";
 import Routes from "./routes";
 
 const router = express.Router();
 
 router.post(
-  Routes.inventory.create,
-  Authenticator.requireUser,
+  Routes.operation.create,
   Authenticator.requireEmployeement,
-  Authenticator.requirePermission,
   controller.createReq
 );
 router.get(
-  Routes.inventory.get,
+  Routes.operation.get,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.readReq
 ); // /get?id="testId"
 router.patch(
-  Routes.inventory.update,
+  Routes.operation.update,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,

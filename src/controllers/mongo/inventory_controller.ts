@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { IInventory, Inventory } from "../models";
+import { IInventory, Inventory } from "../../models/mongo";
 import { productController } from ".";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 
 class InventoryController {
   create = async (inventory: IInventory) => {

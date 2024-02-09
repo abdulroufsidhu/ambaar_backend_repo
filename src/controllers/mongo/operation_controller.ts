@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { IOperation, IPerson, Operation } from "../models";
+import { IOperation, IPerson, Operation } from "../../models/mongo";
 import { inventoryController } from ".";
-import { Logger } from "../libraries/logger";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Logger } from "../../libraries/logger";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 import { personController } from ".";
 import mongoose from "mongoose";
 

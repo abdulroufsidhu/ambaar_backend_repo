@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { IEmployee, IUser } from "../models";
+import { IEmployee, IUser } from "../models/mongo";
 import { config } from "../config/config";
-import { employeeController } from "../controllers";
+import { employeeController } from "../controllers/mongo";
 import { errorResponse } from "../libraries/unified_response";
 import { Logger } from "../libraries/logger";
 

@@ -42,7 +42,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "loge",
 		"body": [
-			"Logger.d('$TM_FILENAME_BASE', $1)"
+			"Logger.e('$TM_FILENAME_BASE', $1)"
 		],
 		"description": "Prints error log to console"
 	},

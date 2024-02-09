@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Person, IPerson } from "../models";
-import { errorResponse, successResponse } from "../libraries/unified_response";
+import { Person, IPerson } from "../../models/mongo";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
 
 
 class PersonController {

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { Business, IBusiness } from "../models";
+import { Business, IBusiness } from "../../models/mongo";
 import { branchController, permissionController } from ".";
-import { errorResponse, successResponse } from "../libraries/unified_response";
-import { Logger } from "../libraries/logger";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
+import { Logger } from "../../libraries/logger";
 
 class BusinessController {
   create = (business: IBusiness, location: string, userId: string) => {

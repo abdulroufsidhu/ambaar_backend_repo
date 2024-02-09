@@ -2,7 +2,7 @@ import mongoose, { CallbackError, Document, Model, Schema } from "mongoose";
 import { IPerson } from "./person";
 import uniqueValidator from "mongoose-unique-validator";
 import bcrypt from 'bcrypt';
-import { Logger } from "../libraries/logger";
+import { Logger } from "../../libraries/logger";
 
 export interface IUser {
   person: IPerson;

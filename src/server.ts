@@ -15,9 +15,9 @@ import {
 	routes,
 	inventoryRoutes,
 	operationRoutes,
-} from "./routes";
-import Routes from "./routes/routes";
-import { Permission } from "./models";
+} from "./routes/mongo";
+import Routes from "./routes/mongo/routes";
+import { Permission } from "./models/mongo";
 import { createConnection } from "typeorm";
 import { AppDataSource } from "./data-source";
 

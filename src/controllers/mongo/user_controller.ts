@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { personController } from ".";
-import { User, IUser } from "../models";
-import { Logger } from "../libraries/logger";
-import { errorResponse, successResponse } from "../libraries/unified_response";
-import { config } from "../config/config";
+import { User, IUser } from "../../models/mongo";
+import { Logger } from "../../libraries/logger";
+import { errorResponse, successResponse } from "../../libraries/unified_response";
+import { config } from "../../config/config";
 import jwt from "jsonwebtoken";
-import UserModel from "../models/user";
+import UserModel from "../../models/mongo/user";
 
 class UserController {
   create = async (user: IUser) => {

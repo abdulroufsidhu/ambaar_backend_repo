@@ -13,6 +13,7 @@ export class CRUD_Factory <T extends ObjectLiteral> {
 		try {
 			return this.repository.create(value);
 		} catch (error) {
+            Logger.w('pg_crud_factory', error)
 			return this.read(value);
 		}
 	}
@@ -21,7 +22,7 @@ export class CRUD_Factory <T extends ObjectLiteral> {
 		try {
 			return this.repository.find({ where: value });
 		} catch (e) {
-			Logger.d("pg_address_controller", e);
+			Logger.w("pg_address_controller", e);
 			return null;
 		}
 	}
@@ -30,6 +31,7 @@ export class CRUD_Factory <T extends ObjectLiteral> {
 		try {
 			return this.repository.update(value["id"], value);
 		} catch (error) {
+            Logger.w('pg_crud_factory', error)
 			return null;
 		}
 	}
@@ -38,8 +40,8 @@ export class CRUD_Factory <T extends ObjectLiteral> {
 		try {
 			return this.repository.delete(value["id"]);
 		} catch (error) {
+            Logger.w('pg_crud_factory', error)
 			return null;
 		}
 	}
-
 }

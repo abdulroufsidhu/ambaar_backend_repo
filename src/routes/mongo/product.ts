@@ -1,24 +1,26 @@
 import express from "express";
-import { operationController as controller } from "../controllers";
-import { Authenticator } from "../middleware/authenticator";
+import { productController as controller } from "../../controllers/mongo";
+import { Authenticator } from "../../middleware/authenticator";
 import Routes from "./routes";
 
 const router = express.Router();
 
 router.post(
-  Routes.operation.create,
+  Routes.products.create,
+  Authenticator.requireUser,
   Authenticator.requireEmployeement,
+  Authenticator.requirePermission,
   controller.createReq
 );
 router.get(
-  Routes.operation.get,
+  Routes.products.get,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,
   controller.readReq
 ); // /get?id="testId"
 router.patch(
-  Routes.operation.update,
+  Routes.products.update,
   Authenticator.requireUser,
   Authenticator.requireEmployeement,
   Authenticator.requirePermission,

@@ -6,17 +6,17 @@ import {
 	Address,
 	Nationality,
 	Contact,
-    Person,
-    Branch,
-    Business,
-    User,
-} from "../entity";
+	Person,
+	Branch,
+	Business,
+	User,
+	Employee,
+	Inventory,
+	Operation,
+	Permission,
+	Product,
+} from "../models/pg";
 import { CRUD_Factory } from "./pg_crud_factory";
-import { Employee } from '../entity/employee';
-import { Inventory } from '../entity/inventory';
-import { Operation } from '../entity/operation';
-import { Permission } from '../entity/permission';
-import { Product } from '../entity/product';
 
 export class CountryCRUD extends CRUD_Factory<Country> {
 	constructor() {
@@ -54,47 +54,47 @@ export class EmailCRUD extends CRUD_Factory<Email> {
 	}
 }
 export class PersonCRUD extends CRUD_Factory<Person> {
-    constructor() {
-        super(Person)
-    }
+	constructor() {
+		super(Person);
+	}
 }
 export class UserCRUD extends CRUD_Factory<User> {
-    constructor() {
-        super(User)
-    }
+	constructor() {
+		super(User);
+	}
 }
 export class BranchCRUD extends CRUD_Factory<Branch> {
-    constructor() {
-        super(Branch)
-    }
+	constructor() {
+		super(Branch);
+	}
 }
 export class BusinessCRUD extends CRUD_Factory<Business> {
-    constructor() {
-        super(Business)
-    }
+	constructor() {
+		super(Business);
+	}
 }
 export class EmployeeCRUD extends CRUD_Factory<Employee> {
-    constructor() {
-        super(Employee)
-    }
+	constructor() {
+		super(Employee);
+	}
 }
 export class InventoryCRUD extends CRUD_Factory<Inventory> {
-    constructor() {
-        super(Inventory)
-    }
+	constructor() {
+		super(Inventory);
+	}
 }
 export class OperationCRUD extends CRUD_Factory<Operation> {
-    constructor() {
-        super(Operation)
-    }
+	constructor() {
+		super(Operation);
+	}
 }
 export class PermissionCRUD extends CRUD_Factory<Permission> {
-    constructor() {
-        super(Permission)
-    }
+	constructor() {
+		super(Permission);
+	}
 }
 export class ProductCRUD extends CRUD_Factory<Product> {
-    constructor() {
-        super(Product)
-    }
+	constructor() {
+		super(Product);
+	}
 }
