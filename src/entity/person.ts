@@ -14,21 +14,21 @@ import { Address, Contact } from "./";
 @Entity()
 export class Person {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	name: string;
+	name?: string;
 
 	@OneToOne(() => Contact, (contact) => contact, { eager: true })
 	@JoinColumn()
-	contact: Contact;
+	contact?: Contact;
 
 	@ManyToOne(() => Address, (address) => address, { eager: true })
-	address: Address;
+	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

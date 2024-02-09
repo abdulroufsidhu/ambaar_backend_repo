@@ -5,17 +5,17 @@ import { Country } from "./";
 @Unique(["name", "country"])
 export class State {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	name: string;
+	name?: string;
 
 	@ManyToOne(() => Country, (country) => country, { eager: true })
-	country: Country;
+	country?: Country;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

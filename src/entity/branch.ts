@@ -15,31 +15,31 @@ import { Business, Address, Contact, Email } from "./";
 @Unique(["name", "code", "business"])
 export class Branch {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	name: string;
+	name?: string;
 
 	@Column()
 	code: string;
 
 	@OneToOne(() => Email, (email) => email, { eager: true })
 	@JoinColumn()
-	email: Email;
+	email?: Email;
 
 	@OneToOne(() => Contact, (contact) => contact, { eager: true })
 	@JoinColumn()
-	contact: Contact;
+	contact?: Contact;
 
 	@ManyToOne(() => Business, (business) => business, { eager: true })
-	business: Business;
+	business?: Business;
 
 	@ManyToOne(() => Address, (address) => address, { eager: true })
-	address: Address;
+	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

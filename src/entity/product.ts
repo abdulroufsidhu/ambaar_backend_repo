@@ -11,23 +11,23 @@ import {
 @Unique(["name", "detail", "color", "variant"])
 export class Product {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	name: string;
+	name?: string;
 
 	@Column()
-	detail: string;
+	detail?: string;
 
 	@Column()
-	color: string;
+	color?: string;
 
 	@Column()
-	variant: string;
+	variant?: string;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

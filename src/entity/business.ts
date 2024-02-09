@@ -5,20 +5,20 @@ import { Person } from "./";
 @Unique(["name", "licence"])
 export class Business {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	name: string;
+	name?: string;
 
 	@Column()
-	licence: string;
+	licence?: string;
 
 	@ManyToOne(() => Person, (person) => person, { eager: true })
-	person: Person;
+	person?: Person;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

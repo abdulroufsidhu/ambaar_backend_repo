@@ -4,18 +4,18 @@ import { Address } from "./";
 @Entity()
 export class Nationality {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	nationalId: string;
+	nationalId?: string;
 
 	@ManyToOne(() => Address, (address) => address, { eager: true })
-	address: Address;
+	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }
 

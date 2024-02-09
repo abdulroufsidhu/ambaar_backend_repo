@@ -7,24 +7,24 @@ import {Branch, Permission, User} from "./"
 @Entity()
 export class Employee {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@ManyToOne(() => Branch, (branch) => branch, { eager: true })
-	branch: Branch;
+	branch?: Branch;
 
 	@ManyToMany(() => Permission, (permission) => permission, { eager: true })
 	@JoinTable()
-	permissions: Permission[];
+	permissions?: Permission[];
 
 	@ManyToOne(() => User, (user) => user.employees)
-	user: User;
+	user?: User;
 
 	@Column()
-	role: string;
+	role?: string;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 }

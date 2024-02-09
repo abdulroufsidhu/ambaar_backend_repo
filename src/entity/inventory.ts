@@ -4,31 +4,31 @@ import { Product, Branch } from "./";
 @Entity()
 export class Inventory {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@ManyToOne(() => Product, (product) => product, { eager: true })
-	product: Product;
+	product?: Product;
 
 	@ManyToOne(() => Branch, (branch) => branch, { eager: true })
 	@JoinTable()
-	branch: Branch;
+	branch?: Branch;
 
     @Column()
-    unitBuyPrice: number
+    unitBuyPrice?: number
 
     @Column()
-    unitSellPrice: number
+    unitSellPrice?: number
 
     @Column()
-    unitAllowedDiscount: number
+    unitAllowedDiscount?: number
 
     @Column()
-    availableQuantity: number
+    availableQuantity?: number
     
     @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    createdAt?: Date;
   
     @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-    updatedAt: Date;
+    updatedAt?: Date;
 
 }
