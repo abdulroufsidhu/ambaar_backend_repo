@@ -5,7 +5,7 @@ export class Contact {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;
 
-	@Column()
+	@Column({unique: true})
 	value?: string;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

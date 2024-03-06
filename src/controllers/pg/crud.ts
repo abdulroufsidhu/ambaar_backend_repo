@@ -15,8 +15,8 @@ import {
 	Operation,
 	Permission,
 	Product,
-} from "../models/pg";
-import { CRUD_Factory } from "./pg_crud_factory";
+} from "../../models/pg";
+import { CRUD_Factory } from "./crud.factory";
 
 export class CountryCRUD extends CRUD_Factory<Country> {
 	constructor() {

@@ -16,10 +16,11 @@ import {
 	inventoryRoutes,
 	operationRoutes,
 } from "./routes/mongo";
-import Routes from "./routes/mongo/routes";
+import pgRoutes from "./routes/pg/user.route"
+import Routes from "./routes/routes";
 import { Permission } from "./models/mongo";
 import { createConnection } from "typeorm";
-import { AppDataSource } from "./data-source";
+import { AppDataSource } from "./data_source";
 
 const server = express();
 
@@ -119,7 +120,7 @@ function startServer() {
 	// TODO implement jwt (json web token) and then authenticate actions with permission
 	// Routes
 	server.use(routes.person.base, personRoutes);
-	server.use(routes.user.base, userRoutes);
+	server.use(routes.user.base, pgRoutes);
 	server.use(routes.businesses.base, businessRoutes);
 	server.use(routes.branches.base, branchRoutes);
 	server.use(routes.employees.base, employeeRoutes);

@@ -21,7 +21,7 @@ export class Branch {
 	name?: string;
 
 	@Column()
-	code: string;
+	code?: string;
 
 	@OneToOne(() => Email, (email) => email, { eager: true })
 	@JoinColumn()

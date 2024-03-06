@@ -1,7 +1,7 @@
 import express from "express";
 import { inventoryController as controller } from "../../controllers/mongo";
 import { Authenticator } from "../../middleware/authenticator";
-import Routes from "./routes";
+import Routes from "../routes";
 
 const router = express.Router();
 

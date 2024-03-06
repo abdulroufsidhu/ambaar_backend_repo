@@ -1,53 +1,67 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany, JoinTable, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from "typeorm";
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	OneToOne,
+	JoinColumn,
+	OneToMany,
+	JoinTable,
+	CreateDateColumn,
+	UpdateDateColumn,
+	BeforeInsert,
+	BeforeUpdate,
+} from "typeorm";
 import { Person, Employee, Email, Nationality } from "./";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 
-
-@Entity()
+@Entity({ name: "ambaar_users" })
 export class User {
 	@PrimaryGeneratedColumn("uuid")
-	id: string;
+	id?: string;
 
 	@Column()
-	username: string;
+	username?: string;
 
-	@OneToOne(() => Email, (email) => email, { eager: true })
+	@OneToOne(() => Email, (email) => email)
 	@JoinColumn()
-	email: Email;
+	email?: Email;
 
-	@OneToOne(() => Person, (person) => person, { eager: true })
+	@OneToOne(() => Person, (person) => person)
 	@JoinColumn()
-	person: Person;
+	person?: Person;
 
-	@OneToOne(() => Nationality, (nationality) => nationality, { eager: true })
+	@OneToOne(() => Nationality, (nationality) => nationality)
 	@JoinColumn()
-	nationality: Nationality;
+	nationality?: Nationality;
 
 	@Column({ select: false })
-	password: string;
+	password?: string;
 
-	@Column()
-	token: string;
+	@Column({ default: null })
+	token?: string;
 
-	@OneToMany(() => Employee, (employee) => employee, { eager: true })
+	@OneToMany(() => Employee, (employee) => employee)
 	@JoinTable()
-	employees: Employee[];
+	employees?: Employee[];
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	createdAt: Date;
+	createdAt?: Date;
 
 	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
-	updatedAt: Date;
+	updatedAt?: Date;
 
 	@BeforeInsert()
 	@BeforeUpdate()
-	async hashPassword() {
+	async hashPassword?() {
 		if (this.password) {
 			const salt = await bcrypt.genSalt(10);
 			this.password = await bcrypt.hash(this.password, salt);
 		}
 	}
 
-	comparePassword = async (candidatePassword: string) =>
-		bcrypt.compare(candidatePassword, this.password);
+	static comparePassword = async (candidatePassword: string, password?: string) =>
+		bcrypt.compare(candidatePassword, password || "");
+
+	static hash = async (string: string) =>
+		await bcrypt.hash(string, await bcrypt.genSalt(10));
 }

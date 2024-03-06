@@ -1,4 +1,4 @@
-import { AppDataSource } from "./data-source"
+import { AppDataSource } from "./data_source"
 import { User } from "./models/pg/user"
 import "reflect-metadata"
 

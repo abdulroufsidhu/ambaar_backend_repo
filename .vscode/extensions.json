@@ -8,5 +8,7 @@
         "Gruntfuggly.todo-tree",
         "GitHub.copilot",
         "Durzn.brackethighlighter",
+        "pmneo.tsimporter",
+        "wix.vscode-import-cost",
     ]
 }

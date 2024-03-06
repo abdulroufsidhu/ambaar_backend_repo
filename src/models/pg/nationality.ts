@@ -6,7 +6,7 @@ export class Nationality {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;
 
-	@Column()
+	@Column({unique: true})
 	nationalId?: string;
 
 	@ManyToOne(() => Address, (address) => address, { eager: true })
