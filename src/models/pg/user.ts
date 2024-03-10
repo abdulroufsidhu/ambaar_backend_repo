@@ -11,8 +11,12 @@ import {
 	BeforeInsert,
 	BeforeUpdate,
 } from "typeorm";
+
+import * as crypto from 'crypto';
+
 import { Person, Employee, Email, Nationality } from "./";
 import bcrypt from "bcryptjs";
+import { config } from "../../config/config";
 
 @Entity({ name: "ambaar_users" })
 export class User {
@@ -37,7 +41,7 @@ export class User {
 	@Column({ select: false })
 	password?: string;
 
-	@Column({ default: null })
+	@Column({ select: false, default: null })
 	token?: string;
 
 	@OneToMany(() => Employee, (employee) => employee)
@@ -54,14 +58,25 @@ export class User {
 	@BeforeUpdate()
 	async hashPassword?() {
 		if (this.password) {
-			const salt = await bcrypt.genSalt(10);
-			this.password = await bcrypt.hash(this.password, salt);
+			this.password = User.encrypt(this.password)
 		}
 	}
 
-	static comparePassword = async (candidatePassword: string, password?: string) =>
-		bcrypt.compare(candidatePassword, password || "");
+	static comparePassword = async (incommingPassword: string, storedHash?: string) => {
+		return incommingPassword === User.decrypt(storedHash ?? "")
+	}
 
-	static hash = async (string: string) =>
-		await bcrypt.hash(string, await bcrypt.genSalt(10));
+	static encrypt(text: string): string {
+		const cipher = crypto.createCipheriv(config.Encryption.algorithm, config.Encryption.key, config.Encryption.iv);
+		let encrypted = cipher.update(text, 'utf-8', 'hex');
+		encrypted += cipher.final('hex');
+		return encrypted;
+	}
+	
+	static decrypt(encryptedText: string): string {
+		const decipher = crypto.createDecipheriv(config.Encryption.algorithm, config.Encryption.key, config.Encryption.iv);
+		let decrypted = decipher.update(encryptedText, 'hex', 'utf-8');
+		decrypted += decipher.final('utf-8');
+		return decrypted;
+	}
 }

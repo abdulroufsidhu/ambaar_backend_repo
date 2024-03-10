@@ -1,8 +1,11 @@
-import { ObjectLiteral, Repository, EntityTarget } from "typeorm";
+import {
+	ObjectLiteral,
+	Repository,
+	EntityTarget,
+	FindManyOptions,
+} from "typeorm";
 import { AppDataSource } from "../../data_source";
 import { Logger } from "../../libraries/logger";
-
-
 
 export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 	protected repository: Repository<T>;
@@ -17,30 +20,27 @@ export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 			const r = await this.repository.insert(v);
 			return r.generatedMaps;
 		} catch (e) {
-			const v = await this.read(value)
-			Logger.w('pg_crud_factory create: ', e)
-			return (v);
+			const v = await this.read({ where: value });
+			Logger.w("pg_crud_factory create: ", e);
+			return v;
 		}
 	}
 
-	async read(value: T) {
+	async read(options: FindManyOptions<T>) {
 		try {
-			let v = {...value}
-			const relations: string[] = []
+			const v: Record<string, any> = options.where ?? {};
+			const relations: string[] = [];
 			for (const key of Object.keys(v)) {
-				if (typeof v[key] === "object") {
-					const r = v[key].constructor.name.toLowerCase()
-					const id = v[key]['id']
-					v[key] = {id: id}
-					relations.push(r) // don't use key because key can be different from object type
+				if (typeof v[key] === "object" && !options.relations) {
+					const r = v[key].constructor.name.toLowerCase();
+					const id = v[key]["id"];
+					v[`${r}.id`] = id;
+					delete v[key];
+					relations.push(r);
 				}
 			}
-			delete v["password"]
-			const toFind = {
-				where: v,
-				relations: relations
-			}
-			return this.repository.find(toFind);
+			if (!options.relations) options.relations = relations;
+			return this.repository.find(options);
 		} catch (e) {
 			Logger.w("pg_crud_factory read:", e);
 			return null;

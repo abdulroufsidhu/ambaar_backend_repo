@@ -21,7 +21,7 @@ import {
 	successResponse,
 } from "../../libraries/unified_response";
 import { Logger } from "../../libraries/logger";
-import { Country } from "../../models/pg/country";
+import user from "../../models/mongo/user";
 
 class UserController extends ControllerFacoty {
 	create = async (
@@ -113,8 +113,8 @@ class UserController extends ControllerFacoty {
 				password: req.body.password,
 			});
 			const user = Array.isArray(userRequest) ? userRequest[0] : userRequest;
-			if (!user) throw "user not found";
-			const u = await this.signWithToken(user);
+			if (!user) throw "user not created";
+			const u = await this.signWithToken(user.id);
 			return successResponse({
 				res: res,
 				code: 201,
@@ -132,12 +132,29 @@ class UserController extends ControllerFacoty {
 		}
 	};
 
-	signWithToken = async (user: User): Promise<User> => {
+	signWithToken = async (userId?: string): Promise<User> => {
+		const userCrud = new UserCRUD();
+		const userRequest = await userCrud.read({
+			where: { id: userId },
+			select: [
+				"id",
+				"username",
+				"email",
+				"person",
+				"nationality",
+				"token",
+				"createdAt",
+				"updatedAt",
+			],
+			relations: ["person", "nationality", "email"],
+		});
+		if (!userRequest) throw "no user found while signing"
+		const user = userRequest[0]
 		if (!user.id) throw "user id not found";
 		const token = jwt.sign(user.id, config.JWT.key);
+
 		user.token = token;
 
-		const userCrud = new UserCRUD();
 		await userCrud.update(user);
 		return user;
 	};
@@ -151,9 +168,9 @@ class UserController extends ControllerFacoty {
 			const emailInQuery: string = req.query.email as string;
 			const passwordInQuery: string = req.query.password as string;
 			if (emailInQuery && passwordInQuery) {
-				return this.login(emailInQuery, passwordInQuery, res, next);
+				return await this.login(emailInQuery, passwordInQuery, res, next);
 			}
-			return this.view(req.query.uid as string, res, next);
+			return await this.view(req.query.uid as string, res, next);
 		} catch (error) {
 			Logger.w("user.controller", error);
 
@@ -172,7 +189,14 @@ class UserController extends ControllerFacoty {
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		const userCrud = new UserCRUD();
-		const user = await userCrud.read({ id: id });
+		if (!id) throw "no uid provided";
+		const user = (
+			await userCrud.read({ where: { id: id }, relations: ["person"] })
+		)?.map((v) => {
+			delete v.token;
+			delete v.password;
+			return v;
+		});
 		if (!user) throw "user not found";
 		return successResponse({
 			res: res,
@@ -188,16 +212,36 @@ class UserController extends ControllerFacoty {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		const emailObj = await new EmailCRUD().read({ value: email });
+		const emailObj = await new EmailCRUD().read({ where: { value: email } });
 		if (!emailObj) throw "email not found";
 		if (emailObj.length < 1) throw "email not found";
 		const userCrud = new UserCRUD();
-		const user = await userCrud.read({ email: emailObj[0] });
+		const uw: Record<string, any> = {};
+		uw[`email.id`] = emailObj[0].id;
+		const user = await userCrud.read({
+			where: uw,
+			select: ["id", "password"],
+		});
+		Logger.d("user.controller", "email: ", emailObj, "user: ", user);
 		if (!user) throw "user not found";
 		if (user.length < 1) throw "user not found";
-		const passwordCorrect = await User.comparePassword(password, user[0].password)
+		const passwordCorrect = await User.comparePassword(
+			password,
+			user[0].password
+		);
+		Logger.i(
+			"user.controller",
+			"password",
+			password,
+			`[${User.encrypt(password)}]`,
+			"user.password",
+			user[0].password,
+			`[${User.decrypt(user[0].password ?? "")}]`,
+			"Correct? ",
+			passwordCorrect
+		);
 		if (passwordCorrect) {
-			const u = await this.signWithToken(user[0]);
+			const u = await this.signWithToken(user[0].id);
 			return successResponse({
 				res: res,
 				code: 200,
@@ -243,7 +287,10 @@ class UserController extends ControllerFacoty {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		const passwordMatches = await User.comparePassword(oldPassword, user.password);
+		const passwordMatches = await User.comparePassword(
+			oldPassword,
+			user.password
+		);
 		if (!passwordMatches) throw "old password is incorrect";
 		const userCrud = new UserCRUD();
 		await userCrud.update({ ...user, password: newPassword });
