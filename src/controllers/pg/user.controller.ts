@@ -22,6 +22,7 @@ import {
 } from "../../libraries/unified_response";
 import { Logger } from "../../libraries/logger";
 import user from "../../models/mongo/user";
+import uniqueValidator from "mongoose-unique-validator";
 
 class UserController extends ControllerFacoty {
 	create = async (
@@ -148,8 +149,8 @@ class UserController extends ControllerFacoty {
 			],
 			relations: ["person", "nationality", "email"],
 		});
-		if (!userRequest) throw "no user found while signing"
-		const user = userRequest[0]
+		if (!userRequest) throw "no user found while signing";
+		const user = userRequest[0];
 		if (!user.id) throw "user id not found";
 		const token = jwt.sign(user.id, config.JWT.key);
 
@@ -228,17 +229,6 @@ class UserController extends ControllerFacoty {
 		const passwordCorrect = await User.comparePassword(
 			password,
 			user[0].password
-		);
-		Logger.i(
-			"user.controller",
-			"password",
-			password,
-			`[${User.encrypt(password)}]`,
-			"user.password",
-			user[0].password,
-			`[${User.decrypt(user[0].password ?? "")}]`,
-			"Correct? ",
-			passwordCorrect
 		);
 		if (passwordCorrect) {
 			const u = await this.signWithToken(user[0].id);

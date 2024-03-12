@@ -1,7 +1,7 @@
 import express from "express";
 import { branchController as controller } from "../../controllers/mongo";
 import Routes from "../routes";
-import { Authenticator } from "../../middleware/authenticator";
+import { Authenticator } from "../../middleware/mongo/authenticator";
 
 const router = express.Router();
 

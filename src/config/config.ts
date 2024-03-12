@@ -15,8 +15,8 @@ interface IConfig {
   }
   Encryption: {
 	algorithm: "aes-256-gcm" | "aes-256-ccm" | "aes-256-ocb" | "aes-256-cbc",
-	key: Buffer,
-	iv: Buffer,
+	key: string,
+	iv: string,
   }
   Server: {
     port: number,
@@ -36,8 +36,8 @@ export const config: IConfig = {
 	},
 	Encryption: {
 		algorithm: "aes-256-cbc",
-		key: crypto.randomBytes(32),
-		iv: crypto.randomBytes(16),
+		key: "12345678901234567890123456789012",
+		iv: "1234567890123456",
 	},
 	Server: {
 		port: Number(process.env.PORT) || 1337,
