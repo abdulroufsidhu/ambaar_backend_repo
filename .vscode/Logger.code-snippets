@@ -10,7 +10,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "logs",
 		"body": [
-			"Logger.s('$TM_FILENAME_BASE', $1)"
+			"Logger.s('$TM_FILENAME', ${1})"
 		],
 		"description": "Prints success log to console"
 	},
@@ -18,7 +18,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "logd",
 		"body": [
-			"Logger.d('$TM_FILENAME_BASE', $1)"
+			"Logger.d('$TM_FILENAME', ${1})"
 		],
 		"description": "Prints debug log to console"
 	},
@@ -26,7 +26,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "logi",
 		"body": [
-			"Logger.i('$TM_FILENAME_BASE', $1)"
+			"Logger.i('$TM_FILENAME', ${1})"
 		],
 		"description": "Prints info log to console"
 	},
@@ -34,7 +34,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "logw",
 		"body": [
-			"Logger.w('$TM_FILENAME_BASE', $1)"
+			"Logger.w('$TM_FILENAME', ${1})"
 		],
 		"description": "Prints warning log to console"
 	},
@@ -42,7 +42,7 @@
 		"scope": "javascript,typescript",
 		"prefix": "loge",
 		"body": [
-			"Logger.e('$TM_FILENAME_BASE', $1)"
+			"Logger.e('$TM_FILENAME', ${1})"
 		],
 		"description": "Prints error log to console"
 	},

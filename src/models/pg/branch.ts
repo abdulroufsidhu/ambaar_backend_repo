@@ -23,18 +23,18 @@ export class Branch {
 	@Column()
 	code?: string;
 
-	@OneToOne(() => Email, (email) => email, { eager: true })
+	@OneToOne(() => Email, (email) => email,)
 	@JoinColumn()
 	email?: Email;
 
-	@OneToOne(() => Contact, (contact) => contact, { eager: true })
+	@OneToOne(() => Contact, (contact) => contact,)
 	@JoinColumn()
 	contact?: Contact;
 
-	@ManyToOne(() => Business, (business) => business, { eager: true })
+	@ManyToOne(() => Business, (business) => business,)
 	business?: Business;
 
-	@ManyToOne(() => Address, (address) => address, { eager: true })
+	@ManyToOne(() => Address, (address) => address,)
 	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

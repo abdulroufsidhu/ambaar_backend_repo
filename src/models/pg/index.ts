@@ -1,9 +1,6 @@
 import { Person } from "./person";
 import { User } from "./user";
-import { Country } from "./country";
-import { State } from "./state";
-import { City } from "./city";
-import { Address } from "./address";
+import { Address, Country, State, City } from "./address";
 import { Business } from "./business";
 import { Branch } from "./branch";
 import { Contact } from "./contact";

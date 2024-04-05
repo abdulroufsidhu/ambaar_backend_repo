@@ -9,7 +9,7 @@ export class Nationality {
 	@Column({unique: true})
 	nationalId?: string;
 
-	@ManyToOne(() => Address, (address) => address, { eager: true })
+	@ManyToOne(() => Address, (address) => address,)
 	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

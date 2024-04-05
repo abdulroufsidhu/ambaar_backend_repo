@@ -1,22 +1,26 @@
 import { NextFunction, Request, Response } from "express";
+import { ObjectLiteral } from "typeorm";
+import {  DataToCrudWrapper } from "./crud.factory";
 
-export abstract class ControllerFacoty {
-	abstract create(
+export abstract class ControllerFactory<
+	Type extends Record<string, any> | ObjectLiteral
+> extends DataToCrudWrapper<Type> {
+	abstract createReq(
 		req: Request,
 		res: Response,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>>;
-	abstract read(
+	abstract readReq(
 		req: Request,
 		res: Response,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>>;
-	abstract update(
+	abstract updateReq(
 		req: Request,
 		res: Response,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>>;
-	abstract delete(
+	abstract deleteReq(
 		req: Request,
 		res: Response,
 		next: NextFunction

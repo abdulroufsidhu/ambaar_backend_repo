@@ -19,7 +19,6 @@ import {
 import pgRoutes from "./routes/pg/user.route"
 import Routes from "./routes/routes";
 import { Permission } from "./models/mongo";
-import { createConnection } from "typeorm";
 import { AppDataSource } from "./data_source";
 
 const server = express();

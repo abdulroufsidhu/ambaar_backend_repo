@@ -13,7 +13,7 @@ export class Business {
 	@Column()
 	licence?: string;
 
-	@ManyToOne(() => Person, (person) => person, { eager: true })
+	@ManyToOne(() => Person, (person) => person,)
 	person?: Person;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

@@ -1,125 +1,59 @@
 import { Request, Response, NextFunction } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
-import { User } from "../../models/pg";
-import { ControllerFacoty } from "./controller.factory";
+import { Email, Person, User } from "../../models/pg";
+import { ControllerFactory } from "./controller.factory";
 import jwt from "jsonwebtoken";
-import {
-	AddressCRUD,
-	CityCRUD,
-	ContactCRUD,
-	CountryCRUD,
-	EmailCRUD,
-	NationalityCRUD,
-	PersonCRUD,
-	StateCRUD,
-	UserCRUD,
-} from "./crud";
+import { EmailCRUD, UserCRUD } from "./crud";
 import { config } from "../../config/config";
 import {
 	errorResponse,
 	successResponse,
 } from "../../libraries/unified_response";
 import { Logger } from "../../libraries/logger";
-import user from "../../models/mongo/user";
-import uniqueValidator from "mongoose-unique-validator";
+import { PersonController } from "./person.controller";
+import { EmailController, NationalityController } from "./address.controller";
+import { ObjectLiteral } from "typeorm";
+import { AppDataSource } from "../../data_source";
 
-class UserController extends ControllerFacoty {
-	create = async (
+export class UserController extends ControllerFactory<User> {
+	create = async (value: User): Promise<ObjectLiteral> => {
+		return await AppDataSource.transaction( async (em) => {
+			if (!value.username) throw "username not provided to create user";
+			if (!value.password) throw "password not provided to create user";
+			if (!value.person) throw "person not provided to create user";
+			if (!value.email) throw "email not provided to create user";
+			if (!value.nationality) throw "nationality not provided to create user";
+			const person = await new PersonController().create(value.person, em);
+			if (!person) throw "unable to create person with data " + value.person;
+			Logger.d('user.controller.ts', "Person->", person)
+			const email = await new EmailController().create(value.email, em);
+			if (!email) throw "unable to create contact";
+			const nationality = await new NationalityController().create(
+				{...value.nationality, address: person.address }, em
+			);
+			if (!nationality) throw "nationality invalid";
+			const createdUser = (
+				await new UserCRUD().create({ ...value, person, email, nationality }, em)
+			)?.at(0);
+			if (!!!createdUser)
+				throw "unable to create user with the provided data " + value;
+			return createdUser;
+		});
+	};
+	createReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		try {
-			const name: string = req.body.name;
-			const username: string = req.body.username;
-
-			const emailRequest = await new EmailCRUD().create({
-				value: req.body.email,
-			});
-			const email = Array.isArray(emailRequest)
-				? emailRequest[0]
-				: emailRequest;
-
-			const contactRequest = await new ContactCRUD().create({
-				value: req.body.contact,
-			});
-			const contact = Array.isArray(contactRequest)
-				? contactRequest[0]
-				: contactRequest;
-
-			const countryRequest = await new CountryCRUD().create({
-				name: req.body.country,
-			});
-			const contry = Array.isArray(countryRequest)
-				? countryRequest[0]
-				: countryRequest;
-
-			if (!contry) throw "country not found";
-
-			const stateRequest = await new StateCRUD().create({
-				name: req.body.state,
-				country: contry,
-			});
-			const state = Array.isArray(stateRequest)
-				? stateRequest[0]
-				: stateRequest;
-			if (!state) throw "state not found";
-
-			const cityRequest = await new CityCRUD().create({
-				name: req.body.city,
-				state: state,
-			});
-			const city = Array.isArray(cityRequest) ? cityRequest[0] : cityRequest;
-			if (!city) throw "city not found";
-
-			const addressRequest = await new AddressCRUD().create({
-				name: req.body.address,
-				city: city,
-			});
-			const address = Array.isArray(addressRequest)
-				? addressRequest[0]
-				: addressRequest;
-			if (!address) throw "address not found";
-
-			if (!contact) throw "contact not found";
-
-			const personRequest = await new PersonCRUD().create({
-				address: address,
-				name: name,
-				contact: contact,
-			});
-			const person = Array.isArray(personRequest)
-				? personRequest[0]
-				: personRequest;
-
-			const nationalityRequest = await new NationalityCRUD().create({
-				nationalId: req.body.nationality,
-				address: address,
-			});
-			const nationality = Array.isArray(nationalityRequest)
-				? nationalityRequest[0]
-				: nationalityRequest;
-
-			if (!email) throw "email not found";
-			if (!person) throw "person not found";
-			if (!nationality) throw "nationality invalid";
-
-			const userCrud = new UserCRUD();
-			const userRequest = await userCrud.create({
-				username: username,
-				email: email,
-				person: person,
-				nationality: nationality,
-				password: req.body.password,
-			});
-			const user = Array.isArray(userRequest) ? userRequest[0] : userRequest;
+			Logger.d("user.controller", req.body);
+			const user = await this.create(req.body);
 			if (!user) throw "user not created";
 			const u = await this.signWithToken(user.id);
 			return successResponse({
 				res: res,
 				code: 201,
-				message: "user created successfully",
 				data: u,
 			});
 		} catch (error) {
@@ -160,7 +94,7 @@ class UserController extends ControllerFacoty {
 		return user;
 	};
 
-	read = async (
+	readReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
@@ -213,17 +147,20 @@ class UserController extends ControllerFacoty {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		const emailObj = await new EmailCRUD().read({ where: { value: email } });
-		if (!emailObj) throw "email not found";
-		if (emailObj.length < 1) throw "email not found";
+		const e = await new EmailController().read(
+			{ value: email },
+			new EmailCRUD()
+		);
+		if (!e) throw "email not found";
+
 		const userCrud = new UserCRUD();
 		const uw: Record<string, any> = {};
-		uw[`email.id`] = emailObj[0].id;
+		uw[`email.id`] = e.id;
 		const user = await userCrud.read({
 			where: uw,
 			select: ["id", "password"],
 		});
-		Logger.d("user.controller", "email: ", emailObj, "user: ", user);
+		Logger.d("user.controller", "email: ", e, "user: ", user);
 		if (!user) throw "user not found";
 		if (user.length < 1) throw "user not found";
 		const passwordCorrect = await User.comparePassword(
@@ -242,16 +179,43 @@ class UserController extends ControllerFacoty {
 		throw "invalid password";
 	};
 
-	update = async (
+	changePasswordReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		const { oldPassword, newPassword, user, ...updates } = req.body;
-		if (oldPassword && newPassword && user) {
-			return this.updatePassword(user, oldPassword, newPassword, res, next);
+		try {
+			const { oldPassword, newPassword, self, } = req.body;
+			if (!!!oldPassword) throw "old password not provided in the request"
+			if (!!!newPassword) throw "new password not provided in the request"
+			if (!!!self) throw "could not find authorized user attachment with the request"
+			return await this.updatePassword (
+				self,
+				oldPassword,
+				newPassword,
+				res,
+				next
+			)
+		} catch(e) {
+			return errorResponse({res,data:e})
 		}
-		return this.userUpdates(user, updates, res, next);
+	}
+
+	updateReq = async (
+		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
+		res: Response<any, Record<string, any>>,
+		next: NextFunction
+	): Promise<Response<any, Record<string, any>>> => {
+		try {
+			const { user, ...updates } = req.body;
+			return await this.userUpdates(user, updates, res, next);
+		} catch (e) {
+			return errorResponse({
+				res: res,
+				code: 500,
+				data: e,
+			});
+		}
 	};
 
 	private userUpdates = async (
@@ -292,7 +256,7 @@ class UserController extends ControllerFacoty {
 		});
 	};
 
-	delete = async (
+	deleteReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction

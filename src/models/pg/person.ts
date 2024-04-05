@@ -19,11 +19,11 @@ export class Person {
 	@Column()
 	name?: string;
 
-	@OneToOne(() => Contact, (contact) => contact, { eager: true })
+	@OneToOne(() => Contact, (contact) => contact, {eager: true, nullable: false})
 	@JoinColumn()
 	contact?: Contact;
 
-	@ManyToOne(() => Address, (address) => address, { eager: true })
+	@ManyToOne(() => Address, (address) => address, {eager: true, nullable: false})
 	address?: Address;
 
 	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })

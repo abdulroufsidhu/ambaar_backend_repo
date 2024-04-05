@@ -10,15 +10,18 @@ export class Employee {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;
 
-	@ManyToOne(() => Branch, (branch) => branch, { eager: true })
+	@ManyToOne(() => Branch, (branch) => branch,)
 	branch?: Branch;
 
-	@ManyToMany(() => Permission, (permission) => permission, { eager: true })
+	@ManyToMany(() => Permission, (permission) => permission,)
 	@JoinTable()
 	permissions?: Permission[];
 
 	@ManyToOne(() => User, (user) => user.employees)
 	user?: User;
+
+	@Column()
+	isActive?: Boolean;
 
 	@Column()
 	role?: string;

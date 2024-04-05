@@ -6,10 +6,10 @@ export class Inventory {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;
 
-	@ManyToOne(() => Product, (product) => product, { eager: true })
+	@ManyToOne(() => Product, (product) => product,)
 	product?: Product;
 
-	@ManyToOne(() => Branch, (branch) => branch, { eager: true })
+	@ManyToOne(() => Branch, (branch) => branch,)
 	@JoinTable()
 	branch?: Branch;
 
