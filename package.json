@@ -24,6 +24,7 @@
       "mongoose-unique-validator": "^4.0.0",
       "pg": "^8.4.0",
       "reflect-metadata": "^0.1.13",
+      "sqlite3": "^5.1.7",
       "typeorm": "0.3.17"
    },
    "devDependencies": {

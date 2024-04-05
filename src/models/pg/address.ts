@@ -8,10 +8,10 @@ export class Country {
 	@Column({ unique: true })
 	name?: string;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }
 
@@ -27,10 +27,10 @@ export class State {
 	@ManyToOne(() => Country, (country) => country,{nullable: false, eager: true})
 	country?: Country;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }
 
@@ -46,10 +46,10 @@ export class City {
 	@ManyToOne(() => State, (state) => state,{nullable: false, eager: true})
 	state?: State;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }
 
@@ -65,9 +65,9 @@ export class Address {
 	@ManyToOne(() => City, (city) => city,{nullable: false})
 	city?: City;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }

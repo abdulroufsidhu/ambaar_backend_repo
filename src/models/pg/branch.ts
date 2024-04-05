@@ -37,9 +37,9 @@ export class Branch {
 	@ManyToOne(() => Address, (address) => address,)
 	address?: Address;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }

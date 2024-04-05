@@ -8,9 +8,9 @@ export class Permission {
 	@Column({ nullable: false, unique: true })
 	name?: string;
 
-	@CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	createdAt?: Date;
 
-	@UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
 	updatedAt?: Date;
 }

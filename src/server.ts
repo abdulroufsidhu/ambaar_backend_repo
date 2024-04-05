@@ -65,7 +65,7 @@ const connectToDB = () => {
 		});
 
 	mongoose
-		.connect(config.DB.url)
+		.connect(config.POSTGRESQL.url)
 		.then(() => {
 			Logger.d("server", "connedted to database");
 			createPermissions();

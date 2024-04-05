@@ -21,12 +21,12 @@ import {
 import { config } from "./config/config";
 
 export const AppDataSource = new DataSource({
-	type: config.DB.type,
-	host: config.DB.host,
-	port: config.DB.port,
-	username: config.DB.user,
-	password: config.DB.password,
-	database: config.DB.dbName,
+	type: config.SQLITE.type,
+	// host: config.POSTGRESQL.host,
+	// port: config.POSTGRESQL.port,
+	// username: config.POSTGRESQL.user,
+	// password: config.POSTGRESQL.password,
+	database: config.SQLITE.database, // config.POSTGRESQL.dbName,
 	synchronize: false,
 	logging: true,
 	entities: [
