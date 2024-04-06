@@ -8,7 +8,7 @@ import {
 	errorResponse,
 	successResponse,
 } from "../../libraries/unified_response";
-import { Person } from "../../models/pg";
+import { Contact, Person } from "../../models/pg";
 import { EntityManager, ObjectLiteral } from "typeorm";
 import { AddressController, ContactController } from "./address.controller";
 import { Address } from '../../models/pg/address';
@@ -21,11 +21,18 @@ export class PersonController extends ControllerFactory<Person> {
 		if (!value.contact) throw "contact not provided to create person";
 		if (!value.address) throw "address not provided to create person";
 		if (!value.name) throw "name not provided to create person";
-		const contact = await new ContactController().create(
-			value.contact,
-			entityManager
-		);
-		if (!contact) throw "contact missing";
+		let contact: Contact = value.contact
+		try{
+			if (!!!contact.id) {
+				contact = await new ContactController().create(
+					value.contact,
+					entityManager
+				);
+				if (!contact) throw "contact missing";
+			}
+		} catch (e) {
+			contact = await new ContactController().read(value.contact, new ContactCRUD())
+		}
 		const address = await new AddressController().create(
 			value.address,
 			entityManager

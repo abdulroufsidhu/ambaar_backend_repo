@@ -22,10 +22,14 @@ export class BranchController extends ControllerFactory<Branch> {
 		if (!!!value.address) throw "branch address not provided";
 		if (!!!value.business) throw "business info not provided along branch";
 		if (!!!value.contact) throw "branch contact not provided";
-		const email = await new EmailController().create(value.email);
-		const address = await new AddressController().create(value.address);
-		const business = await new BusinessController().create(value.business);
-		const contact = await new ContactController().create(value.contact);
+		if (!!!value.code) throw "branch code not provided"
+		if (!!!value.name) throw "branch name not provided"
+		
+		// these ternaries simply mean that if the incomming object has id map it otherwise create new database entry
+		const email = value.email.id ? value.email : await new EmailController().create(value.email);
+		const address = value.address.id ? value.address : await new AddressController().create(value.address);
+		const business = value.business.id ? value.business : await new BusinessController().create(value.business);
+		const contact = value.contact.id ? value.contact : await new ContactController().create(value.contact);
 		const returnable = (
 			await new BranchCRUD().create({
 				...value,
@@ -36,7 +40,7 @@ export class BranchController extends ControllerFactory<Branch> {
 			})
 		)?.at(0);
 		if (!!!returnable) throw "error creating branch";
-		return returnable;
+		return {...value, ...returnable, email, address, business, contact};
 	};
 
 	createReq = async (

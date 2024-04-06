@@ -1,13 +1,9 @@
-import { Person } from "./person";
-import { User } from "./user";
-import { Address, Country, State, City } from "./address";
-import { Business } from "./business";
-import { Branch } from "./branch";
-import { Contact } from "./contact";
-import { Email } from "./email";
-import { Nationality } from "./nationality";
-import { Permission } from "./permission";
+import { User, Nationality, Person } from "./user";
 import { Employee } from "./employee";
+import { Address, Country, State, City } from "./address";
+import { Business, Branch } from "./business";
+import { Contact, Email } from "./contact";
+import { Permission } from "./permission";
 import { Product } from "./product";
 import { Inventory } from "./inventory";
 import { Operation } from "./operation";

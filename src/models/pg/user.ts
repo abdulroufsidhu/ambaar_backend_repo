@@ -10,13 +10,55 @@ import {
 	UpdateDateColumn,
 	BeforeInsert,
 	BeforeUpdate,
+	Unique,
+	ManyToOne,
+	ManyToMany,
 } from "typeorm";
 
 import * as crypto from 'crypto';
 
-import { Person, Employee, Email, Nationality } from "./";
-import bcrypt from "bcryptjs";
+import { Email, Branch, Permission, Address, Contact, Employee } from "./";
 import { config } from "../../config/config";
+
+@Entity()
+export class Person {
+	@PrimaryGeneratedColumn("uuid")
+	id?: string;
+
+	@Column()
+	name?: string;
+
+	@OneToOne(() => Contact, (contact) => contact, {eager: true, nullable: false})
+	@JoinColumn()
+	contact?: Contact;
+
+	@ManyToOne(() => Address, (address) => address, {eager: true, nullable: false})
+	address?: Address;
+
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+	createdAt?: Date;
+
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+	updatedAt?: Date;
+}
+
+@Entity()
+export class Nationality {
+	@PrimaryGeneratedColumn("uuid")
+	id?: string;
+
+	@Column({unique: true})
+	nationalId?: string;
+
+	@ManyToOne(() => Address, (address) => address,)
+	address?: Address;
+
+	@CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+	createdAt?: Date;
+
+	@UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+	updatedAt?: Date;
+}
 
 @Entity({ name: "ambaar_users" })
 export class User {
@@ -26,7 +68,7 @@ export class User {
 	@Column()
 	username?: string;
 
-	@OneToOne(() => Email, (email) => email)
+	@OneToOne(() => Email, (email: Email) => email)
 	@JoinColumn()
 	email?: Email;
 

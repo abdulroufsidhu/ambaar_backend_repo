@@ -1,22 +1,29 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { Person, Employee, Inventory } from "./"
+import { Person, Inventory, User } from "./"
 
 @Entity()
 export class Operation {
     @PrimaryGeneratedColumn('uuid')
     id?: string
 
-    @ManyToOne(()=>Employee, (employee)=>employee, {eager: true})
-    employee?: Employee
+    @ManyToOne(()=>User, (user)=>user, {eager: true})
+    user?: User
 
     @ManyToOne(()=>Person, (person)=>person, {eager: true})
     customer?: Person
 
+    // 0 means read
+    // 1 means create
+    // 2 means update
+    // 3 means delete
     @Column()
-    action?: string
+    action?: 0|1|2|3 
 
     @Column()
-    quantiry?: number
+    url?: string
+
+    @Column()
+    quantity?: number
 
     @Column()
     price?: number

@@ -1,16 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, Column, CreateDateColumn, UpdateDateColumn, Unique } from "typeorm";
-
-import {Branch, Permission, User} from "./"
-
-
+import { Entity, Unique, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Branch, Permission, User } from "./";
 
 @Entity()
-@Unique(["branch", "user", "role"])
+@Unique("employee_unique_constraint",["branch", "user", "role"])
 export class Employee {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;
 
-	@ManyToOne(() => Branch, (branch) => branch,)
+	@ManyToOne(() => Branch, (branch: Branch) => branch,)
 	branch?: Branch;
 
 	@ManyToMany(() => Permission, (permission) => permission,)

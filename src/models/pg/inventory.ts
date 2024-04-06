@@ -9,7 +9,7 @@ export class Inventory {
 	@ManyToOne(() => Product, (product) => product,)
 	product?: Product;
 
-	@ManyToOne(() => Branch, (branch) => branch,)
+	@ManyToOne(() => Branch, (branch: Branch) => branch,)
 	@JoinTable()
 	branch?: Branch;
 
@@ -32,3 +32,7 @@ export class Inventory {
     updatedAt?: Date;
 
 }
+
+
+
+

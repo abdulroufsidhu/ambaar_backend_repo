@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 
 @Entity()
-@Unique(["name", "detail", "color", "variant"])
+@Unique("product_unique_constraint",["name", "detail", "color", "variant"])
 export class Product {
 	@PrimaryGeneratedColumn("uuid")
 	id?: string;

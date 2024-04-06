@@ -7,8 +7,6 @@ import cors from "cors";
 import {
 	businessRoutes,
 	personRoutes,
-	userRoutes,
-	branchRoutes,
 	employeeRoutes,
 	permissionRoutes,
 	productRoutes,
@@ -16,7 +14,8 @@ import {
 	inventoryRoutes,
 	operationRoutes,
 } from "./routes/mongo";
-import pgRoutes from "./routes/pg/user.route"
+import userRoutes from "./routes/pg/user.route"
+import branchRoutes from "./routes/pg/branch.route"
 import Routes from "./routes/routes";
 import { Permission } from "./models/mongo";
 import { AppDataSource } from "./data_source";
@@ -119,7 +118,7 @@ function startServer() {
 	// TODO implement jwt (json web token) and then authenticate actions with permission
 	// Routes
 	server.use(routes.person.base, personRoutes);
-	server.use(routes.user.base, pgRoutes);
+	server.use(routes.user.base, userRoutes);
 	server.use(routes.businesses.base, businessRoutes);
 	server.use(routes.branches.base, branchRoutes);
 	server.use(routes.employees.base, employeeRoutes);

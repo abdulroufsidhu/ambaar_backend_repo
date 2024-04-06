@@ -15,10 +15,14 @@ export class BusinessController extends ControllerFactory<Business> {
 
 	create = async (value: Business): Promise<ObjectLiteral> => {
 		if (!!!value.person) throw "person not provided while registering business"
-		const person = (await new PersonController().create(value.person))
+		if (!!!value.name) throw "business name bot provided"
+		if (!!!value.licence) throw "business licence not provided"
+
+		// checking if incomming request has person.id than use it otherwise create new
+		const person = value.person.id ? value.person : (await new PersonController().create(value.person))
 		const v = (await new BusinessCRUD().create({...value, person}))?.at(0)
 		if (!!!v) throw "unable to create business"
-		return v
+		return {...value, ...v, person}
 	}
 
 	createReq = async (
