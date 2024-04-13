@@ -3,11 +3,11 @@
 
 # Quick Setup
 
-- This project is directly linked with <a href="https://github.com/abdulroufsidhu/ambaar_frontend_repo.git" target="_blank">ambaar-frontend-repo</a>
+- This is a backend for inventory management system
 
 **Quick Start**
 
-- run `npm i && npm start`
+- run `npm i && npm run db_sync && npm start`
 
 ### Project Architecture
 > Your commitment to continuous improvement in architecture and [documentation](./docs/models/readme.md) is commendable. Let's work together to refine and enhance the system.
