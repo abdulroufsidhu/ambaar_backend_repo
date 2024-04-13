@@ -21,9 +21,9 @@ export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 	async create(value: T, entityManager?: EntityManager) {
 		const v = await this.repository.create(value)
 		if (entityManager) {
-			return (await entityManager.insert(this.targetEntity, v)).generatedMaps
+			return (await entityManager.insert(this.targetEntity, v)).generatedMaps as T[]
 		}
-		return (await this.repository.insert(v)).generatedMaps
+		return (await this.repository.insert(v)).generatedMaps as T[]
 	}
 
 	async read(options: FindManyOptions<T>, entityManager?: EntityManager) {

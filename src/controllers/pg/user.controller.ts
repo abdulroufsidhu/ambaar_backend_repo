@@ -13,34 +13,38 @@ import {
 import { Logger } from "../../libraries/logger";
 import { PersonController } from "./person.controller";
 import { EmailController, NationalityController } from "./address.controller";
-import { ObjectLiteral } from "typeorm";
+import { EntityManager, ObjectLiteral } from "typeorm";
 import { AppDataSource } from "../../data_source";
 
 export class UserController extends ControllerFactory<User> {
-	create = async (value: User): Promise<ObjectLiteral> => {
+	create = async (value: User, entityManager?: EntityManager) => {
+		if (entityManager) return this.runCreateInEntityManager(value, entityManager) // if already in transaction do not create one
 		return await AppDataSource.transaction( async (em) => {
-			if (!value.username) throw "username not provided to create user";
-			if (!value.password) throw "password not provided to create user";
-			if (!value.person) throw "person not provided to create user";
-			if (!value.email) throw "email not provided to create user";
-			if (!value.nationality) throw "nationality not provided to create user";
-			const person = await new PersonController().create(value.person, em);
-			if (!person) throw "unable to create person with data " + value.person;
-			Logger.d('user.controller.ts', "Person->", person)
-			const email = await new EmailController().create(value.email, em);
-			if (!email) throw "unable to create contact";
-			const nationality = await new NationalityController().create(
-				{...value.nationality, address: person.address }, em
-			);
-			if (!nationality) throw "nationality invalid";
-			const createdUser = (
-				await new UserCRUD().create({ ...value, person, email, nationality }, em)
-			)?.at(0);
-			if (!!!createdUser)
-				throw "unable to create user with the provided data " + value;
-			return createdUser;
+			return this.runCreateInEntityManager(value, em)
 		});
 	};
+	private async runCreateInEntityManager(value: User, em: EntityManager) {
+		if (!value.username) throw "username not provided to create user";
+		if (!value.password) throw "password not provided to create user";
+		if (!value.person) throw "person not provided to create user";
+		if (!value.email) throw "email not provided to create user";
+		if (!value.nationality) throw "nationality not provided to create user";
+		const person = value.person.id ? value.person : await new PersonController().create(value.person, em);
+		if (!person) throw "unable to create person with data " + value.person;
+		Logger.d('user.controller.ts', "Person->", person)
+		const email = value.email.id ? value.email : await new EmailController().create(value.email, em);
+		if (!email) throw "unable to create contact";
+		const nationality = value.nationality.id ? value.nationality : await new NationalityController().create(
+			{...value.nationality, address: person.address }, em
+		);
+		if (!nationality) throw "nationality invalid";
+		const createdUser = (
+			await new UserCRUD().create({ ...value, person, email, nationality }, em)
+		)?.at(0);
+		if (!!!createdUser)
+			throw "unable to create user with the provided data " + value;
+		return createdUser;
+	}
 	createReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,

@@ -3,6 +3,8 @@ import { AddressController, NationalityController, EmailController, ContactContr
 import { BusinessController } from './business.controller';
 import { PersonController } from './person.controller';
 import { UserController } from './user.controller';
+import { EmployeeController } from './employee.controller';
+import { PermissionController } from './permission.controller';
 
 export {
   BranchController,
@@ -13,4 +15,6 @@ export {
   UserController,
   EmailController,
   ContactController,
+  EmployeeController,
+  PermissionController,
 };

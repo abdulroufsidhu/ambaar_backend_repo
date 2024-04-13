@@ -2,35 +2,44 @@ import { Request, Response, NextFunction } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { ControllerFactory } from "./controller.factory";
-import { ObjectLiteral } from "typeorm";
+import { EntityManager, ObjectLiteral } from "typeorm";
 import {
 	errorResponse,
 	successResponse,
 } from "../../libraries/unified_response";
-import { Employee } from "../../models/pg";
+import { Employee, Permission } from "../../models/pg";
 import { UserController } from "./user.controller";
 import { BranchController } from "./branch.controller";
 import { EmployeeCRUD } from "./crud";
-import { PermissionController } from "./permission.controller";
+import { AppDataSource } from "../../data_source";
+
 export class EmployeeController extends ControllerFactory<Employee> {
-	create = async (value: Employee): Promise<ObjectLiteral> => {
+	create = async (value: Employee, entityManager?: EntityManager) => {
+		if (!!entityManager) return this.runCreateInTransaction(value, entityManager)
+		return AppDataSource.transaction(em=> this.runCreateInTransaction(value, em))
+	};
+
+	private async runCreateInTransaction(value: Employee, em: EntityManager) {
 		if (!!!value.user) throw "no user info while creating employee";
 		if (!!!value.branch) throw "no branch info while creating employee";
 		if (!!!value.permissions)
 			throw "no permissions supplied while adding employee";
 		if (!!!value.role) throw "no role supplied while adding employee";
-		const user = await new UserController().create(value.user);
-		const branch = await new BranchController().create(value.branch);
-		const permissions = await new PermissionController().createAll(
-			value.permissions
-		);
+		const user = value.user.id
+			? value.user
+			: await new UserController().create(value.user);
+		const branch = value.branch.id
+			? value.branch
+			: await new BranchController().create(value.branch);
+		const permissions = value.permissions
 
-		const e = (
+		const e = !!value.id ? value : (
 			await new EmployeeCRUD().create({ ...value, user, branch, permissions })
 		)?.at(0);
 		if (!!!e) throw "unable to create employee with data " + value;
 		return e;
-	};
+	}
+
 	createReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
