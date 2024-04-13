@@ -272,7 +272,3 @@ export class UserController extends ControllerFactory<User> {
 		});
 	};
 }
-
-const userController = new UserController();
-
-export default userController;
