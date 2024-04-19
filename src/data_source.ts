@@ -17,7 +17,7 @@ import {
 	Person,
 	Product,
 	State,
-} from "./models/pg";
+} from "./models";
 import { config } from "./config/config";
 
 export const AppDataSource = new DataSource({

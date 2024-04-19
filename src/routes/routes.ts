@@ -34,6 +34,7 @@ const Routes : Record<string, Record<string, string>> = {
     get: "/get",
     update: "/update",
     remove: "/remove",
+    selfEmployeements: "/self_employeements"
   },
   permissions: {
     base: "/permissions",

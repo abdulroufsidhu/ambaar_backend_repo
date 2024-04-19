@@ -5,75 +5,68 @@ import { config } from "./config/config";
 import { Logger } from "./libraries/logger";
 import cors from "cors";
 import {
-	businessRoutes,
-	personRoutes,
-	employeeRoutes,
 	permissionRoutes,
 	productRoutes,
 	routes,
 	inventoryRoutes,
 	operationRoutes,
-} from "./routes/mongo";
-import userRoutes from "./routes/pg/user.route"
-import branchRoutes from "./routes/pg/branch.route"
+} from "./routes";
+import userRoutes from "./routes/user.route";
+import branchRoutes from "./routes/branch.route";
+import businessRoutes from "./routes/business.route";
+import personRoutes from "./routes/person.route";
+import employeeRoutes from "./routes/employee.route";
 import Routes from "./routes/routes";
-import { Permission } from "./models/mongo";
 import { AppDataSource } from "./data_source";
+import { PermissionController } from "./controllers";
 
 const server = express();
 
 server.use(cors());
 
 const createPermissions = async () => {
-	const permissionPromises = [];
-
-	for (const base in Routes) {
-		if (Routes.hasOwnProperty(base)) {
-			for (const url in Routes[base]) {
-				if (Routes[base].base != Routes[base][url]) {
-					// Create a new Permission document
-					const permissionName = `${Routes[base].base}${Routes[base][url]}`;
-
-					// Save the document to the database
-					const newPermission = new Permission({ name: permissionName });
-					try {
-						const permissionPromise = newPermission.save();
-						permissionPromises.push(permissionPromise);
-					} catch (error) {}
+	const permController = new PermissionController();
+	const permissions = []
+	try {
+		for (const base in Routes) {
+			if (Routes.hasOwnProperty(base)) {
+				for (const url in Routes[base]) {
+					if (Routes[base].base != Routes[base][url]) {
+						// Create a new Permission document
+						const permissionName = `${Routes[base].base}${Routes[base][url]}`;
+						// Save the document to the database
+						permissions.push({ name: permissionName });
+					}
 				}
 			}
 		}
-	}
-
-	// Wait for all permission documents to be saved
-	try {
-		await Promise.all(permissionPromises);
-		console.log("Permission documents created for route patterns.");
-	} catch (error) {
-		Logger.w("server", (error as Error).message);
-	}
+		permController.create(permissions).catch(e=>Logger.w('server.ts', e))
+	} catch (error) {}
 };
 
 const connectToDB = () => {
 	AppDataSource.initialize()
 		.then(() => {
-			Logger.d("server", "connected to postgress");
+			Logger.d("server", "connected to databse");
+			createPermissions();
+			startServer();
 		})
 		.catch((error) => {
 			Logger.w("server", error);
 		});
 
-	mongoose
-		.connect(config.POSTGRESQL.url)
-		.then(() => {
-			Logger.d("server", "connedted to database");
-			createPermissions();
-			startServer();
-		})
-		.catch((error) => {
-			Logger.d("server", `${error}`);
-			connectToDB();
-		});
+	// since we are moving toward sqlite so no longer connecting to mongo db
+	// mongoose
+	// 	.connect(config.POSTGRESQL.url)
+	// 	.then(() => {
+	// 		Logger.d("server", "connedted to database");
+	// 		createPermissions();
+	// 		startServer();
+	// 	})
+	// 	.catch((error) => {
+	// 		Logger.d("server", `${error}`);
+	// 		connectToDB();
+	// 	});
 };
 
 connectToDB();

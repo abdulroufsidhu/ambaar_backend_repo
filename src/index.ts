@@ -1,5 +1,5 @@
 import { AppDataSource } from "./data_source"
-import { User } from "./models/pg/user"
+import { User } from "./models/user"
 import "reflect-metadata"
 
 AppDataSource.initialize().then(async () => {
