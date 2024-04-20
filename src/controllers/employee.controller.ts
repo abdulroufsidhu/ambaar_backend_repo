@@ -28,24 +28,29 @@ export class EmployeeController extends ControllerFactory<Employee> {
 		if (!!!value.role) throw "no role supplied while adding employee";
 		const user = value.user.id
 			? value.user
-			: (await new UserController().create(value.user,em)).at(0);
+			: (await new UserController().create(value.user, em)).at(0);
 		const branch = value.branch.id
 			? value.branch
-			: (await new BranchController().create(value.branch,em)).at(0);
+			: (await new BranchController().create(value.branch, em)).at(0);
 		const permissions = value.permissions;
+
+		Logger.d("employee.controller.ts", "create-> permissions", permissions);
 
 		const e = !!value.id
 			? value
 			: (
-					await new EmployeeCRUD().create({
-						...value,
-						user,
-						branch,
-						permissions,
-					},em)
+					await new EmployeeCRUD().create(
+						{
+							...value,
+							user,
+							branch,
+							permissions: permissions,
+						},
+						em
+					)
 			  )?.at(0);
 		if (!!!e) throw "unable to create employee with data " + value;
-		return [{...e, user, branch, permissions}];
+		return [{ ...e, user, branch, permissions }];
 	}
 
 	createReq = async (
@@ -62,13 +67,14 @@ export class EmployeeController extends ControllerFactory<Employee> {
 		}
 	};
 
-	selfEmployeementsReq = async (req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
+	selfEmployeementsReq = async (
+		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		try {
 			const data = await this.read(
-				{ user: {id: req.body.self} },
+				{ user: { id: req.body.self } },
 				new EmployeeCRUD(),
 				["branch", "permissions", "user"]
 			);
@@ -76,7 +82,7 @@ export class EmployeeController extends ControllerFactory<Employee> {
 		} catch (e) {
 			return errorResponse({ res, data: e });
 		}
-	}
+	};
 
 	readReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,

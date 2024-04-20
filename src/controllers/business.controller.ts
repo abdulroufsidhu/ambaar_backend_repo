@@ -3,10 +3,12 @@ import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { ControllerFactory } from "./controller.factory";
 import { PersonController } from "./person.controller";
-import { Business } from "../models";
+import { Branch, Business } from "../models";
 import { BusinessCRUD } from "./crud";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { EntityManager, ObjectLiteral } from "typeorm";
+import { AppDataSource } from "../data_source";
+import { BranchController } from "./branch.controller";
 
 export class BusinessController extends ControllerFactory<Business> {
 	create = async (value: Business, em?: EntityManager): Promise<Business[]> => {
@@ -18,7 +20,9 @@ export class BusinessController extends ControllerFactory<Business> {
 		const person = value.person.id
 			? value.person
 			: (await new PersonController().create(value.person, em)).at(0);
-		const v = (await new BusinessCRUD().create({ ...value, person }, em))?.at(0);
+		const v = (await new BusinessCRUD().create({ ...value, person }, em))?.at(
+			0
+		);
 		if (!!!v) throw "unable to create business";
 		return [{ ...value, ...v, person }];
 	};
@@ -28,19 +32,30 @@ export class BusinessController extends ControllerFactory<Business> {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		try {
-			const data = await this.create(req.body);
-			return successResponse({
-				res: res,
-				code: 201,
-				data: data,
-			});
-		} catch (e) {
-			return errorResponse({
-				res: res,
-				data: e,
-			});
-		}
+		return AppDataSource.transaction(async (em) => {
+			try {
+				const businessInfo = await this.create(req.body, em);
+				const b: Branch = {
+					code: req.body.code,
+					address: req.body.address,
+					contact: req.body.contact,
+					email: req.body.email,
+					name: req.body.branch_name ?? "Main",
+					business: businessInfo.at(0),
+				};
+				const branch = await new BranchController().create(b, em);
+				return successResponse({
+					res: res,
+					code: 201,
+					data: branch,
+				});
+			} catch (e) {
+				return errorResponse({
+					res: res,
+					data: e,
+				});
+			}
+		});
 	};
 	readReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,

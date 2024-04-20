@@ -10,13 +10,13 @@ router.post(
 	Authenticator.requireUser,
 	new controller().createReq
 );
-router.get(
-	Routes.branches.get,
-	Authenticator.requireUser,
-	Authenticator.requireEmployeement,
-	Authenticator.requirePermission,
-	new controller().readReq
-); // /get?id="testId"
+// router.get(
+// 	Routes.branches.get,
+// 	Authenticator.requireUser,
+// 	Authenticator.requireEmployeement,
+// 	Authenticator.requirePermission,
+// 	new controller().readReq
+// ); // /get?id="testId"
 router.patch(
 	Routes.branches.update,
 	Authenticator.requireUser,

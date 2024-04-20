@@ -19,30 +19,24 @@ export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 		this.targetEntity = value;
 	}
 
-	async create(value: T | T[], entityManager?: EntityManager) {
+	async create(value: T | T[], entityManager?: EntityManager): Promise<T[]> {
 		try {
+			const arrValue = Array.isArray(value) ? value : [value] // making sure the incomming value is processed as array
+			const savable = this.repository.create(arrValue);
 			if (!!entityManager) {
-				return (await entityManager?.insert(this.targetEntity, value)).generatedMaps
+				return await entityManager?.save(savable);
+				// return (await entityManager?.insert(this.targetEntity, value)).generatedMaps
 			}
-			return (await this.repository.insert(value)).generatedMaps
+			const saved = await this.repository.save(savable);
+			return Array.isArray(saved) ? saved : [saved];
 		} catch (e) {
-			const v = value as Record<string, any>
-			delete v["id"]
-			Logger.w('crud.factory.ts', "toSearch: ", v, "error: ", e)
-			return this.read({
-				where: v
-			})
+			const v = value as Record<string, any>;
+			delete v["id"];
+			Logger.w("crud.factory.ts", "toSearch: ", v, "error: ", e);
+			return await this.read({
+				where: v,
+			});
 		}
-
-		// const queryExecutor = entityManager ?? this.repository
-		// const queryResults = (await queryExecutor.createQueryBuilder()
-		// .insert()
-		// .into(this.targetEntity)
-		// .values(value)
-		// .orIgnore()
-		// .execute()).generatedMaps
-		// Logger.i('crud.factory.ts', queryResults)
-		// return queryResults
 	}
 
 	async read(options: FindManyOptions<T>, entityManager?: EntityManager) {
@@ -58,7 +52,7 @@ export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 			}
 		}
 		if (!options.relations && !!options.where) options.relations = relations;
-		if (!!!options.where) delete options.where
+		if (!!!options.where) delete options.where;
 		if (entityManager) {
 			return entityManager.find(this.targetEntity, options);
 		}
