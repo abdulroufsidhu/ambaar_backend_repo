@@ -21,21 +21,20 @@ export class CRUD_Factory<T extends ObjectLiteral | Record<string, any>> {
 
 	async create(value: T | T[], entityManager?: EntityManager): Promise<T[]> {
 		try {
-			const arrValue = Array.isArray(value) ? value : [value] // making sure the incomming value is processed as array
+			// making sure the incomming value is processed as array
+			const arrValue = Array.isArray(value) ? value : [value]; 
 			const savable = this.repository.create(arrValue);
 			if (!!entityManager) {
 				return await entityManager?.save(savable);
-				// return (await entityManager?.insert(this.targetEntity, value)).generatedMaps
 			}
-			const saved = await this.repository.save(savable);
-			return Array.isArray(saved) ? saved : [saved];
+			return await this.repository.save(savable);
 		} catch (e) {
 			const v = value as Record<string, any>;
 			delete v["id"];
-			Logger.w("crud.factory.ts", "toSearch: ", v, "error: ", e);
+			Logger.i('crud.factory.ts', "searching for: ", v)
 			return await this.read({
 				where: v,
-			});
+			}, entityManager);
 		}
 	}
 
@@ -79,7 +78,7 @@ export abstract class DataToCrudWrapper<
 > {
 	abstract create(value: Type, entityManager?: EntityManager): Promise<Type[]>;
 	async read(
-		value: Type,
+		value: Type | undefined,
 		crud: CRUD_Factory<Type>,
 		relations?: string[],
 		select?: string[],

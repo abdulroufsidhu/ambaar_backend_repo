@@ -4,11 +4,13 @@ import { ParsedQs } from "qs";
 import { ControllerFactory } from "./controller.factory";
 import { PersonController } from "./person.controller";
 import { Branch, Business } from "../models";
-import { BusinessCRUD } from "./crud";
+import { BusinessCRUD, PermissionCRUD } from "./crud";
 import { errorResponse, successResponse } from "../libraries/unified_response";
 import { EntityManager, ObjectLiteral } from "typeorm";
 import { AppDataSource } from "../data_source";
 import { BranchController } from "./branch.controller";
+import { PermissionController } from "./permission.controller";
+import { EmployeeController } from "./employee.controller";
 
 export class BusinessController extends ControllerFactory<Business> {
 	create = async (value: Business, em?: EntityManager): Promise<Business[]> => {
@@ -32,9 +34,9 @@ export class BusinessController extends ControllerFactory<Business> {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
-		return AppDataSource.transaction(async (em) => {
+		return await AppDataSource.transaction(async (em) => {
 			try {
-				const businessInfo = await this.create(req.body, em);
+				const businessInfo = await this.create(req.body,em);
 				const b: Branch = {
 					code: req.body.code,
 					address: req.body.address,
@@ -43,12 +45,24 @@ export class BusinessController extends ControllerFactory<Business> {
 					name: req.body.branch_name ?? "Main",
 					business: businessInfo.at(0),
 				};
-				const branch = await new BranchController().create(b, em);
-				return successResponse({
-					res: res,
-					code: 201,
-					data: branch,
-				});
+				const branch = (await new BranchController().create(b, em)).at(0);
+				const empInfo = {
+					branch,
+					permissions : 
+					await new PermissionController().read(
+						{},
+						new PermissionCRUD(),
+						undefined,
+						undefined,
+						em
+					),
+					role : "Founder",
+					user : {
+						id: req.body.self,
+					}
+				}
+				const createdEmployeement = await new EmployeeController().create(empInfo, em);
+				return successResponse({res, code: 201, data: createdEmployeement})
 			} catch (e) {
 				return errorResponse({
 					res: res,

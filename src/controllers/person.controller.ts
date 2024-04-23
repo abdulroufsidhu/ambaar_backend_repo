@@ -4,14 +4,12 @@ import { ParsedQs } from "qs";
 import { ControllerFactory } from "./controller.factory";
 import { AddressCRUD, ContactCRUD, PersonCRUD } from "./crud";
 import { Logger } from "../libraries/logger";
-import {
-	errorResponse,
-	successResponse,
-} from "../libraries/unified_response";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 import { Contact, Person } from "../models";
 import { EntityManager, ObjectLiteral } from "typeorm";
 import { AddressController, ContactController } from "./address.controller";
-import { Address } from '../models/address';
+import { Address } from "../models/address";
+import { AppDataSource } from "../data_source";
 
 export class PersonController extends ControllerFactory<Person> {
 	create = async (
@@ -21,22 +19,17 @@ export class PersonController extends ControllerFactory<Person> {
 		if (!value.contact) throw "contact not provided to create person";
 		if (!value.address) throw "address not provided to create person";
 		if (!value.name) throw "name not provided to create person";
-		let contact: Contact | undefined = value.contact
-		try{
-			if (!!!contact.id) {
-				contact = (await new ContactController().create(
-					value.contact,
-					entityManager
-				)).at(0);
-				if (!contact) throw "contact missing";
-			}
-		} catch (e) {
-			contact = (await new ContactController().read(value.contact, new ContactCRUD())).at(0)
-		}
-		const address = (await new AddressController().create(
-			value.address,
-			entityManager
-		)).at(0);
+		let contact = !!value.contact?.id
+			? value.contact
+			: (
+					await new ContactController().create(value.contact, entityManager)
+			  )?.at(0);
+		if (!contact) throw "unable to create or retrieve contact";
+		const address = !!value.address?.id
+			? value.address
+			: (await new AddressController().create(value.address, entityManager)).at(
+					0
+			  );
 		if (!address) throw "address missing";
 		const pName = value.name;
 		const person = (
@@ -50,7 +43,7 @@ export class PersonController extends ControllerFactory<Person> {
 			)
 		)?.at(0);
 		if (!person) throw "unable to record person";
-		return [{...value, ...person, address, contact}];
+		return [{ ...value, ...person, address, contact }];
 	};
 	createReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
@@ -58,8 +51,11 @@ export class PersonController extends ControllerFactory<Person> {
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		try {
-			const person = await this.create(req.body);
-			if (!person) throw "unable to create person with data " + req.body;
+			const person = await AppDataSource.transaction(async (em) => {
+				const person = await this.create(req.body, em);
+				if (!person) throw "unable to create person with data " + req.body;
+				return person;
+			});
 			return successResponse({
 				res: res,
 				code: 201,
@@ -74,17 +70,30 @@ export class PersonController extends ControllerFactory<Person> {
 			});
 		}
 	};
+
 	readReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		try {
-			const person = (await this.read(
-				{ id: req.query.pid as string },
-				new PersonCRUD(),
-				["contact", "address"]
-			)).at(0);
+			let condition: Person | undefined = undefined
+			if (!!req.query.p_name) {
+				condition = {
+					name: req.query.p_name as string
+				}
+			}
+			if (!!req.query.pid) {
+				condition = {
+					id: req.query.pid as string
+				}
+			}
+			const person = (
+				await this.read(condition, new PersonCRUD(), [
+					"contact",
+					"address",
+				])
+			);
 			return successResponse({
 				res: res,
 				code: 200,

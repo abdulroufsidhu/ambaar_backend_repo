@@ -40,7 +40,7 @@ const createPermissions = async () => {
 				}
 			}
 		}
-		permController.create(permissions).catch(e=>Logger.w('server.ts', e))
+		await permController.create(permissions)
 	} catch (error) {}
 };
 
