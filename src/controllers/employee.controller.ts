@@ -21,11 +21,11 @@ export class EmployeeController extends ControllerFactory<Employee> {
 	};
 
 	private async runCreateInTransaction(value: Employee, em: EntityManager) {
-		if (!!!value.user) throw "no user info while creating employee";
-		if (!!!value.branch) throw "no branch info while creating employee";
+		if (!!!value.user) throw Error("no user info while creating employee");
+		if (!!!value.branch) throw Error("no branch info while creating employee");
 		if (!!!value.permissions)
-			throw "no permissions supplied while adding employee";
-		if (!!!value.role) throw "no role supplied while adding employee";
+			throw Error("no permissions supplied while adding employee");
+		if (!!!value.role) throw Error("no role supplied while adding employee");
 		const user = value.user.id
 			? value.user
 			: (await new UserController().create(value.user, em)).at(0);
@@ -49,7 +49,7 @@ export class EmployeeController extends ControllerFactory<Employee> {
 						em
 					)
 			  )?.at(0);
-		if (!!!e) throw "unable to create employee with data " + value;
+		if (!!!e) throw Error("unable to create employee with data " + value) ;
 		return [{ ...e, user, branch, permissions }];
 	}
 

@@ -14,9 +14,9 @@ import { EmployeeController } from "./employee.controller";
 
 export class BusinessController extends ControllerFactory<Business> {
 	create = async (value: Business, em?: EntityManager): Promise<Business[]> => {
-		if (!!!value.person) throw "person not provided while registering business";
-		if (!!!value.name) throw "business name bot provided";
-		if (!!!value.licence) throw "business licence not provided";
+		if (!!!value.person) throw Error("person not provided while registering business");
+		if (!!!value.name) throw Error("business name bot provided");
+		if (!!!value.licence) throw Error("business licence not provided");
 
 		// checking if incomming request has person.id than use it otherwise create new
 		const person = value.person.id
@@ -25,7 +25,7 @@ export class BusinessController extends ControllerFactory<Business> {
 		const v = (await new BusinessCRUD().create({ ...value, person }, em))?.at(
 			0
 		);
-		if (!!!v) throw "unable to create business";
+		if (!!!v) throw Error("unable to create business");
 		return [{ ...value, ...v, person }];
 	};
 

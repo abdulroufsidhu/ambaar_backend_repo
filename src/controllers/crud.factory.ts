@@ -97,7 +97,7 @@ export abstract class DataToCrudWrapper<
 		entityManager?: EntityManager
 	): Promise<UpdateResult> {
 		const v = await crud.update(value, entityManager);
-		if (!!!v) throw "unable to update " + value;
+		if (!!!v) throw Error("unable to update "+ value);
 		return v;
 	}
 	async delete(

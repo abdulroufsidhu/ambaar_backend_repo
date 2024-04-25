@@ -25,7 +25,7 @@ export class EmailController extends DataToCrudWrapper<Email> {
 		entityManager?: EntityManager
 	): Promise<Email[]> => {
 		const v = (await new EmailCRUD().create(value, entityManager))?.at(0);
-		if (!!!v) throw "unable to create email";
+		if (!!!v) throw Error("unable to create email");
 		return [{ ...value, ...v }];
 	};
 }
@@ -35,7 +35,7 @@ export class ContactController extends DataToCrudWrapper<Contact> {
 		entityManager?: EntityManager
 	): Promise<Contact[]> => {
 		const v = (await new ContactCRUD().create(value, entityManager))?.at(0);
-		if (!!!v) throw "unable to create contact";
+		if (!!!v) throw Error("unable to create contact");
 		return [{ ...value, ...v }];
 	};
 }
@@ -44,8 +44,8 @@ export class NationalityController extends DataToCrudWrapper<Nationality> {
 		value: Nationality,
 		entityManager?: EntityManager
 	): Promise<Nationality[]> => {
-		if (!!!value.address) throw "address is missing from nationality";
-		if (!!!value.nationalId) throw "nationalId is missing from nationality";
+		if (!!!value.address) throw Error("address is missing from nationality");
+		if (!!!value.nationalId) throw Error("nationalId is missing from nationality");
 		let address: Address | undefined = value.address;
 		if (!value.address.id) {
 			address = (await new AddressController().create(
@@ -53,11 +53,11 @@ export class NationalityController extends DataToCrudWrapper<Nationality> {
 				entityManager
 			)).at(0);
 		}
-		if (!!!address) throw "unable to create address"
+		if (!!!address) throw Error("unable to create address")
 		const v = (
 			await new NationalityCRUD().create({ ...value, address }, entityManager)
 		)?.at(0);
-		if (!!!v) throw "unable to create nationality";
+		if (!!!v) throw Error("unable to create nationality");
 		return [{ ...value, ...v, address }];
 	};
 }
@@ -68,7 +68,7 @@ class CountryController extends DataToCrudWrapper<Country> {
 		entityManager?: EntityManager
 	): Promise<Country[]> => {
 		const v = (await new CountryCRUD().create(value, entityManager))?.at(0);
-		if (!!!v) throw "unable to create country";
+		if (!!!v) throw Error("unable to create country");
 		return [{ ...value, ...v }];
 	};
 }
@@ -78,7 +78,7 @@ class StateController extends DataToCrudWrapper<State> {
 		entityManager?: EntityManager
 	): Promise<State[]> => {
 		const v = (await new StateCRUD().create(value, entityManager))?.at(0);
-		if (!!!v) throw "unable to create State";
+		if (!!!v) throw Error("unable to create State");
 		return [{ ...value, ...v }];
 	};
 }
@@ -88,7 +88,7 @@ class CityController extends DataToCrudWrapper<City> {
 		entityManager?: EntityManager
 	): Promise<City[]> => {
 		const v = (await new CityCRUD().create(value, entityManager))?.at(0);
-		if (!!!v) throw "unable to create City";
+		if (!!!v) throw Error("unable to create City");
 		return [{ ...value, ...v }];
 	};
 }
@@ -105,7 +105,7 @@ export class AddressController extends ControllerFactory<Address> {
 			entityManager
 		)).at(0);
 		Logger.d("address.controller.ts", "country->", country);
-		if (!!!country) throw "unable to create country from " + addr;
+		if (!!!country) throw Error("unable to create country from "+ addr) ;
 		const state = (await new StateController().create(
 			{
 				country,
@@ -114,7 +114,7 @@ export class AddressController extends ControllerFactory<Address> {
 			entityManager
 		)).at(0);
 		Logger.d("address.controller.ts", "state->", state);
-		if (!!!state) throw "unable to create state from " + addr;
+		if (!!!state) throw Error("unable to create state from "+ addr) ;
 		const city = (await new CityController().create(
 			{
 				state,
@@ -123,12 +123,12 @@ export class AddressController extends ControllerFactory<Address> {
 			entityManager
 		)).at(0);
 		Logger.d("address.controller.ts", "city->", city);
-		if (!!!city) throw "unable to create city from " + addr;
+		if (!!!city) throw Error("unable to create city from "+ addr) ;
 		const address = (
 			await new AddressCRUD().create({ ...addr, city }, entityManager)
 		)?.at(0);
 		Logger.d("address.controller.ts", "address->", address);
-		if (!!!address) throw "unable to create addres from " + addr;
+		if (!!!address) throw Error("unable to create addres from " + addr);
 		return [{ ...address, city }];
 	}
 	createReq = async (
@@ -172,7 +172,7 @@ export class AddressController extends ControllerFactory<Address> {
 		try {
 			const addrCrud = new AddressCRUD();
 			const cd = (await this.create(req.body as Address)).at(0); // update request can contain new data
-			if (!!!cd) throw "could not create address"
+			if (!!!cd) throw Error("could not create address")
 			const data = this.update(cd, addrCrud);
 			return successResponse({ res, data });
 		} catch (e) {

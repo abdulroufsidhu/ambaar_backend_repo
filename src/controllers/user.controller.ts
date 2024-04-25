@@ -24,25 +24,25 @@ export class UserController extends ControllerFactory<User> {
 		});
 	};
 	private async runCreateInEntityManager(value: User, em: EntityManager) {
-		if (!value.username) throw "username not provided to create user";
-		if (!value.password) throw "password not provided to create user";
-		if (!value.person) throw "person not provided to create user";
-		if (!value.email) throw "email not provided to create user";
-		if (!value.nationality) throw "nationality not provided to create user";
+		if (!value.username) throw Error("username not provided to create user");
+		if (!value.password) throw Error("password not provided to create user");
+		if (!value.person) throw Error("person not provided to create user");
+		if (!value.email) throw Error("email not provided to create user");
+		if (!value.nationality) throw Error("nationality not provided to create user");
 		const person = value.person.id ? value.person : (await new PersonController().create(value.person, em)).at(0);
-		if (!person) throw "unable to create person with data " + value.person;
+		if (!person) throw Error("unable to create person with data ");
 		Logger.d('user.controller.ts', "Person->", person)
 		const email = value.email.id ? value.email : (await new EmailController().create(value.email, em)).at(0);
-		if (!email) throw "unable to create contact";
+		if (!email) throw Error("unable to create contact");
 		const nationality = value.nationality.id ? value.nationality : (await new NationalityController().create(
 			{...value.nationality, address: person.address }, em
 		)).at(0);
-		if (!nationality) throw "nationality invalid";
+		if (!nationality) throw Error("nationality invalid");
 		const createdUser = (
 			await new UserCRUD().create({ ...value, person, email, nationality }, em)
 		)?.at(0);
 		if (!!!createdUser)
-			throw "unable to create user with the provided data " + value;
+			throw Error("unable to create user with the provided data ");
 		return [createdUser];
 	}
 	createReq = async (
@@ -53,7 +53,7 @@ export class UserController extends ControllerFactory<User> {
 		try {
 			Logger.d("user.controller", req.body);
 			const user = (await this.create(req.body)).at(0);
-			if (!user) throw "user not created";
+			if (!user) throw Error("user not created");
 			const u = await this.signWithToken(user.id);
 			return successResponse({
 				res: res,
@@ -87,9 +87,9 @@ export class UserController extends ControllerFactory<User> {
 			],
 			relations: ["person", "nationality", "email"],
 		});
-		if (!userRequest) throw "no user found while signing";
+		if (!userRequest) throw Error("no user found while signing");
 		const user = userRequest[0];
-		if (!user.id) throw "user id not found";
+		if (!user.id) throw Error("user id not found");
 		const token = jwt.sign(user.id, config.JWT.key);
 
 		user.token = token;
@@ -128,7 +128,7 @@ export class UserController extends ControllerFactory<User> {
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>>> => {
 		const userCrud = new UserCRUD();
-		if (!id) throw "no uid provided";
+		if (!id) throw Error("no uid provided");
 		const user = (
 			await userCrud.read({ where: { id: id }, relations: ["person"] })
 		)?.map((v) => {
@@ -136,7 +136,7 @@ export class UserController extends ControllerFactory<User> {
 			delete v.password;
 			return v;
 		});
-		if (!user) throw "user not found";
+		if (!user) throw Error("user not found");
 		return successResponse({
 			res: res,
 			code: 200,
@@ -155,7 +155,7 @@ export class UserController extends ControllerFactory<User> {
 			{ value: email },
 			new EmailCRUD()
 		)).at(0);
-		if (!e) throw "email not found";
+		if (!e) throw Error("email not found");
 
 		const userCrud = new UserCRUD();
 		const uw: Record<string, any> = {};
@@ -165,8 +165,8 @@ export class UserController extends ControllerFactory<User> {
 			select: ["id", "password"],
 		});
 		Logger.d("user.controller", "email: ", e, "user: ", user);
-		if (!user) throw "user not found";
-		if (user.length < 1) throw "user not found";
+		if (!user) throw Error("user not found");
+		if (user.length < 1) throw Error("user not found");
 		const passwordCorrect = await User.comparePassword(
 			password,
 			user[0].password
@@ -180,7 +180,7 @@ export class UserController extends ControllerFactory<User> {
 				data: u,
 			});
 		}
-		throw "invalid password";
+		throw Error("invalid password");
 	};
 
 	changePasswordReq = async (
@@ -190,9 +190,9 @@ export class UserController extends ControllerFactory<User> {
 	): Promise<Response<any, Record<string, any>>> => {
 		try {
 			const { oldPassword, newPassword, self, } = req.body;
-			if (!!!oldPassword) throw "old password not provided in the request"
-			if (!!!newPassword) throw "new password not provided in the request"
-			if (!!!self) throw "could not find authorized user attachment with the request"
+			if (!!!oldPassword) throw Error("old password not provided in the request")
+			if (!!!newPassword) throw Error("new password not provided in the request")
+			if (!!!self) throw Error("could not find authorized user attachment with the request")
 			return await this.updatePassword (
 				self,
 				oldPassword,
@@ -249,7 +249,7 @@ export class UserController extends ControllerFactory<User> {
 			oldPassword,
 			user.password
 		);
-		if (!passwordMatches) throw "old password is incorrect";
+		if (!passwordMatches) throw Error("old password is incorrect");
 		const userCrud = new UserCRUD();
 		await userCrud.update({ ...user, password: newPassword });
 		return successResponse({

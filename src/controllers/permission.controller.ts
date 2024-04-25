@@ -17,15 +17,15 @@ export class PermissionController extends ControllerFactory<Permission> {
 	};
 
 	private async createSingle(value: Permission) {
-		if (!!!value.name) throw "permission name not provided while adding one";
+		if (!!!value.name) throw Error("permission name not provided while adding one");
 		const p = (await new PermissionCRUD().create(value));
-		if (!!!p || !!!p.at(0)) throw "unable to create permission " + value;
+		if (!!!p || !!!p.at(0)) throw Error("unable to create permission ") ;
 		return p;
 	}
 
     private async createAll(values: Permission[]): Promise<ObjectLiteral[]> {
         const p = (await new PermissionCRUD().create(values))
-		if (!!!p) throw "unable to create permissions"
+		if (!!!p) throw Error("unable to create permissions")
 		return p
     }
 

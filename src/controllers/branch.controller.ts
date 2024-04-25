@@ -19,12 +19,12 @@ import { Logger } from "../libraries/logger";
 
 export class BranchController extends ControllerFactory<Branch> {
 	create = async (value: Branch, em?: EntityManager): Promise<Branch[]> => {
-		if (!!!value.email) throw "branch email not provided";
-		if (!!!value.address) throw "branch address not provided";
-		if (!!!value.business) throw "business info not provided along branch";
-		if (!!!value.contact) throw "branch contact not provided";
-		if (!!!value.code) throw "branch code not provided";
-		if (!!!value.name) throw "branch name not provided";
+		if (!!!value.email) throw Error("branch email not provided");
+		if (!!!value.address) throw Error("branch address not provided");
+		if (!!!value.business) throw Error("business info not provided along branch");
+		if (!!!value.contact) throw Error("branch contact not provided");
+		if (!!!value.code) throw Error("branch code not provided");
+		if (!!!value.name) throw Error("branch name not provided");
 
 		// these ternaries simply mean that if the incomming object has id map it otherwise create new database entry
 		const email = value.email.id
@@ -48,7 +48,7 @@ export class BranchController extends ControllerFactory<Branch> {
 				contact,
 			}, em)
 		)?.at(0);
-		if (!!!returnable) throw "error creating branch";
+		if (!!!returnable) throw Error("error creating branch");
 
 		return [{ ...returnable, email, address, business, contact, code: value.code, name: value.name }];
 	};
