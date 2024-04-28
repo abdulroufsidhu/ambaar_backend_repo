@@ -5,6 +5,8 @@ import { EntityManager } from "typeorm";
 import { Inventory } from "../models";
 import { ControllerFactory } from "./controller.factory";
 import { InventoryCRUD } from "./crud";
+import { AppDataSource } from "../data_source";
+import { errorResponse, successResponse } from "../libraries/unified_response";
 
 export class InventoryController extends ControllerFactory<Inventory> {
 	createReq = async (
@@ -12,7 +14,15 @@ export class InventoryController extends ControllerFactory<Inventory> {
 		res: Response<any, Record<string, any>>,
 		next: NextFunction
 	): Promise<Response<any, Record<string, any>> | undefined> => {
-		throw new Error("Method not implemented.");
+		try {
+			const data = await AppDataSource.transaction(async e => {
+				const item: Inventory = req.body
+				return await this.create(item, e)
+			})
+			return successResponse({res, code: 201, data})
+		} catch (error) {
+			return errorResponse({res, data: error})
+		}
 	};
 	readReq = async (
 		req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
